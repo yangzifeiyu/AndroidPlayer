@@ -1,0 +1,110 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent">
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/imgPreview"
+        android:src="@drawable/preview_btn"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <FrameLayout
+        android:id="@+id/show_template_frame_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_toRightOf="@id/imgPreview"
+        android:layout_alignParentTop="true"
+        android:layout_marginRight="25dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
+        android:layout_marginLeft="40dp"
+        >
+        <com.example.mfusion.Template.TemplateView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/show_template_my_view"/>
+
+
+    </FrameLayout>
+
+
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Preview"
+        android:id="@+id/txtPreview"
+        android:layout_below="@+id/imgPreview"
+        android:layout_alignLeft="@+id/imgPreview"
+        android:layout_alignStart="@+id/imgPreview" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Save"
+        android:id="@+id/txtSave"
+        android:layout_below="@+id/imgSave"
+        android:layout_alignLeft="@+id/imgPreview"
+        android:layout_alignStart="@+id/imgPreview" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Save As"
+        android:id="@+id/txtSaveAs"
+        android:layout_above="@+id/imgDelete"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Delete"
+        android:id="@+id/txtDelete"
+        android:layout_alignBottom="@+id/show_template_frame_layout"
+        android:layout_alignRight="@+id/txtSaveAs"
+        android:layout_alignEnd="@+id/txtSaveAs" />
+
+
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/imgSave"
+        android:src="@drawable/save"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/txtPreview"
+        android:layout_alignRight="@+id/txtPreview"
+        android:layout_alignEnd="@+id/txtPreview"
+        android:onClick="InsertTemp" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/imgSaveAs"
+        android:src="@drawable/save_as"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/txtSave"
+        android:layout_alignRight="@+id/txtSaveAs"
+        android:layout_alignEnd="@+id/txtSaveAs" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/imgDelete"
+        android:src="@drawable/delete_btn"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignRight="@+id/txtSaveAs"
+        android:layout_alignEnd="@+id/txtSaveAs" />
+
+
+</RelativeLayout>
