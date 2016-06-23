@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:weightSum="1">
+
+    <TextView
+        android:layout_width="164dp"
+        android:layout_height="wrap_content"
+        android:text="see template"
+        android:id="@+id/tvScheB"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="0.07" />
+
+    <EditText
+        android:layout_width="373dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/sche1"
+        android:layout_below="@+id/tvScheB"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:onClick="addTempCompo"
+        android:hint="tem1"
+        android:layout_alignRight="@+id/tvScheB"
+        android:layout_alignEnd="@+id/tvScheB" />
+
+    <EditText
+        android:layout_width="380dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/sche2"
+        android:layout_below="@+id/sche1"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignRight="@+id/sche1"
+        android:layout_alignEnd="@+id/sche1"
+        android:hint="tem2" />
+
+    <EditText
+        android:layout_width="377dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/sche3"
+        android:hint="tem3"
+        android:layout_centerVertical="true"
+        android:layout_toStartOf="@+id/btnInsertNow"
+        android:layout_toLeftOf="@+id/btnInsertNow" />
+
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="138dp"
+        android:layout_height="wrap_content"
+        android:text="Insert now."
+        android:id="@+id/btnInsertNow"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="0.07"
+        android:layout_alignParentBottom="true"
+        android:layout_toRightOf="@+id/tvScheB"
+        android:layout_toEndOf="@+id/tvScheB"
+        android:layout_marginLeft="145dp"
+        android:layout_marginStart="145dp"
+        android:layout_marginBottom="31dp"
+        android:onClick="addCompoinfo" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/sche4"
+        android:layout_alignBottom="@+id/sche1"
+        android:hint="tem4"
+        android:layout_toLeftOf="@+id/tem7"
+        android:layout_toRightOf="@+id/sche1"
+        android:layout_toEndOf="@+id/sche1" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tem5"
+        android:layout_alignTop="@+id/sche2"
+        android:layout_alignRight="@+id/sche4"
+        android:layout_alignEnd="@+id/sche4"
+        android:layout_alignLeft="@+id/sche4"
+        android:layout_alignStart="@+id/sche4"
+        android:hint="tem5" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tem6"
+        android:hint="tem6"
+        android:layout_alignTop="@+id/sche3"
+        android:layout_alignRight="@+id/tem8"
+        android:layout_alignEnd="@+id/tem8"
+        android:layout_toRightOf="@+id/sche3"
+        android:layout_toEndOf="@+id/sche3" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tem7"
+        android:layout_alignTop="@+id/sche4"
+        android:layout_alignRight="@+id/btnInsertNow"
+        android:layout_alignEnd="@+id/btnInsertNow"
+        android:layout_alignLeft="@+id/btnInsertNow"
+        android:layout_alignStart="@+id/btnInsertNow"
+        android:hint="tem7" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tem8"
+        android:layout_alignTop="@+id/tem5"
+        android:layout_alignRight="@+id/tem7"
+        android:layout_alignEnd="@+id/tem7"
+        android:layout_alignLeft="@+id/tem7"
+        android:layout_alignStart="@+id/tem7"
+        android:hint="tem8" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tem9"
+        android:hint="tem9"
+        android:layout_alignTop="@+id/sche3"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignLeft="@+id/tem11"
+        android:layout_alignStart="@+id/tem11" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tem10"
+        android:layout_alignTop="@+id/tem7"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_toRightOf="@+id/tem7"
+        android:layout_toEndOf="@+id/tem7"
+        android:hint="tem10" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tem11"
+        android:layout_alignTop="@+id/tem8"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignLeft="@+id/tem10"
+        android:layout_alignStart="@+id/tem10"
+        android:hint="tem11" />
+
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Reteive Data"
+        android:id="@+id/btnRetriveCompo"
+        android:layout_alignBottom="@+id/btnInsertNow"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:onClick="viewTemplateCompo" />
+
+</RelativeLayout>
