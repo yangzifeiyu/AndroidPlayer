@@ -13,102 +13,62 @@ import com.example.mfusion.model.ScheduleComponent;
 
 import java.util.ArrayList;
 
+public class ScheduleView extends View {
 
-/**
- * Created by JCYYYY on 2016/6/20.
- */
-public class ScheduleView extends View{
+        private Paint myPaint;
+        private Paint textPaint;
 
-    private Context context;
 
-    private int viewWidth;
-    private int viewHeight;
-
-    private int areaClicked;
-
-    private ArrayList<ScheduleComponent> components;
-
-    private Paint myPaint;
-    private Paint textPaint;
-
-    private final String TAG="ScheduleView";
-
-    public ScheduleView(Context context) {
+    ScheduleView(Context context, AttributeSet attrs){
         super(context);
-    }
-
-    public ScheduleView(final Context context, AttributeSet attrs) {
-        super(context, attrs);
         myPaint = new Paint();
         myPaint.setColor(Color.BLACK);
         myPaint.setStyle(Paint.Style.STROKE);
         myPaint.setStrokeWidth(3f);
 
-
-        textPaint = new Paint();
+        textPaint=new Paint();
         textPaint.setColor(Color.BLACK);
         textPaint.setTextSize(50f);
 
-        components = new ArrayList<>();
-
-        this.context = context;
     }
+    protected void onDraw(Canvas canvas){
+        //super.onDraw(canvas);
 
-    @Override
-    public void onWindowFocusChanged(boolean hasWindowFocus) {
-        super.onWindowFocusChanged(hasWindowFocus);
-        viewWidth=getWidth();
-        viewHeight=getHeight();
-    }
+        Rect myRect=new Rect();
+        myRect.set(canvas.getWidth()/50,0,canvas.getWidth(),canvas.getHeight()/8);
 
-    protected void onDraw(Canvas canvas) {
+        Paint col1=new Paint();
+        col1.setColor(Color.BLUE);
+        col1.setStyle(Paint.Style.STROKE);
 
-        for (ScheduleComponent component : components) {
-            component.setParentWidth(viewWidth);
-            component.setParentHeight(viewHeight);
-            canvas.drawRect(component.getResolvedLeft(), component.getResolvedTop(), component.getResolvedRight(), component.getResolvedBottom(), myPaint);
-
-        }
+        canvas.drawRect(myRect,col1);//block1
 
 
-    }
+        Rect myRect2=new Rect();
+        myRect2.set(canvas.getWidth()/50,canvas.getHeight()/8,canvas.getWidth()/15*4,canvas.getHeight());
 
-    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        super.onSizeChanged(w, h, oldw, oldh);
-        viewHeight = h;
-        viewWidth = w;
+        Paint col2=new Paint();
+        col2.setColor(Color.BLUE);
+        col2.setStyle(Paint.Style.STROKE);
 
-    }
+        canvas.drawRect(myRect2,col2);//block2
 
-    private int whichArea(float x, float y) {
-        for (int i = 0; i < components.size(); i++) {
-            ScheduleComponent current = components.get(i);
-            float left = current.getResolvedLeft();
-            float top = current.getResolvedTop();
-            float right = current.getResolvedRight();
-            float bottom = current.getResolvedBottom();
-            if (x > left && x < right && y > top && y < bottom)
-                return i;
-        }
-        return -1;
 
+        Rect myRect3=new Rect();
+        myRect3.set(canvas.getWidth()/15*4,canvas.getHeight()/8,canvas.getWidth(),canvas.getHeight());
+
+        Paint col3=new Paint();
+        col3.setColor(Color.BLUE);
+        col3.setStyle(Paint.Style.STROKE);
+
+        canvas.drawRect(myRect3,col3);//block3
     }
 
 
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-
-        Log.i(TAG, "onTouchEvent: touched area="+whichArea(event.getX(),event.getY()));
-        areaClicked=whichArea(event.getX(),event.getY());
-        return super.onTouchEvent(event);
-
-    }
-
-    public int getAreaClicked(){
-        return areaClicked;
-    }
-
-//    public ScheduleView(Context context, AttributeSet attrs, int defStyleAttr) {
-//        super(context, attrs, defStyleAttr);
-//    }
 }
+
+
+   
+  
+
+   
