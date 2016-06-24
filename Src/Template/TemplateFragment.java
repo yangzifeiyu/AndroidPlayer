@@ -5,18 +5,18 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 
-import com.example.mfusion.R;
-import com.example.mfusion.ShowTemplateActivity;
-import com.example.mfusion.model.MyTemplate;
-
 import java.util.ArrayList;
 
-
+import com.example.mfusion.R;
+import com.example.mfusion.model.MyTemplate;
+//import com.example.tabsswipe.TestActivity;
 
 public class TemplateFragment extends Fragment implements View.OnClickListener{
 
@@ -78,10 +78,19 @@ public class TemplateFragment extends Fragment implements View.OnClickListener{
 		templateView.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Intent goShow=new Intent(container.getContext(),ShowTemplateActivity.class);
+				Intent goShow=new Intent(container.getContext(), com.example.mfusion.ShowTemplateActivity.class);
 				goShow.putExtra("tid",templates.get(currentPosition).getId());
 				startActivity(goShow);
 				return;
+			}
+		});
+
+		templateView.setOnLongClickListener(new View.OnLongClickListener() {
+			@Override
+			public boolean onLongClick(View v) {
+//				Intent goTest=new Intent(container.getContext(), TestActivity.class);
+//				startActivity(goTest);
+				return false;
 			}
 		});
 
@@ -103,15 +112,15 @@ public class TemplateFragment extends Fragment implements View.OnClickListener{
 
 
 
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+	@Override
+	public void onViewCreated(View view, Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
 
-        currentPosition=0;
-        templateView.addTemplate(templates.get(currentPosition));
-    }
+		currentPosition=0;
+		templateView.addTemplate(templates.get(currentPosition));
+	}
 
-    public void onClick(View v) {
+	public void onClick(View v) {
 		switch (v.getId()){
 			case R.id.btnNext:
 				templateView.clearComponent();
