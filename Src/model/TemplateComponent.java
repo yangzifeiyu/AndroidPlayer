@@ -32,8 +32,6 @@ public class TemplateComponent implements Parcelable{
     private int parentWidth;
     private int parentHeight;
 
-
-
     public int getParentWidth() {
         return parentWidth;
     }
@@ -124,8 +122,7 @@ public class TemplateComponent implements Parcelable{
         this.bottom = bottom;
     }
 
-
-    public TemplateComponent(Context context, float left, float top, float right, float bottom) {
+    public TemplateComponent(Context context,float left, float top, float right, float bottom) {
 
         this.left = left;
         this.top = top;
@@ -138,6 +135,7 @@ public class TemplateComponent implements Parcelable{
         parentWidth=su.getWidth();
         parentHeight=su.getHeight();
     }
+
     //------------prece
     protected TemplateComponent(Parcel in) {
         left = in.readFloat();
@@ -172,7 +170,7 @@ public class TemplateComponent implements Parcelable{
     }
 
     @SuppressWarnings("unused")
-    public static final Creator<TemplateComponent> CREATOR = new Creator<TemplateComponent>() {
+    public static final Parcelable.Creator<TemplateComponent> CREATOR = new Parcelable.Creator<TemplateComponent>() {
         @Override
         public TemplateComponent createFromParcel(Parcel in) {
             return new TemplateComponent(in);
