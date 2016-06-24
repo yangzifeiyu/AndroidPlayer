@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.mfusion"
+    android:versionCode="1"
+    android:versionName="1.0">
+
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET"/>
+
+    <application
+        android:name=".MyApplication"
+        android:allowBackup="true"
+        android:icon="@drawable/logo"
+        android:label="@string/app_name"
+        android:theme="@style/MyTheme">
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="landscape">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <receiver
+            android:name=".Receiver.BootUpReceiver"
+            android:enabled="false"
+            android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name=".Receiver.AlarmReceiver"
+            android:process=":remote" />
+        <receiver
+            android:name=".Receiver.AlarmReceiver2"
+            android:process=":remote" />
+
+        <activity android:name=".ScheduleBlock.BlockItem" />
+        <activity android:name=".ScheduleBlock.ScheduleBlock" />
+        <activity android:name=".TemplateComponent.TemplateCompo" />
+        <activity android:name=".Schedule.Schedule" />
+        <activity android:name=".Template.TemplateDB" />
+        <activity android:name=".Schedule.ScheduleDataListActivity" />
+        <activity android:name=".ScheduleBlock.ScheduleBlockListActivity" />
+        <activity android:name=".Template.TemplateDataListActivity" />
+        <activity android:name=".TemplateComponent.TemplateCompoListActivity" />
+        <activity android:name=".ScheduleBlock.BlockItemListActivity"></activity>
+        <activity android:name=".ShowScreenActivity"></activity>
+        <activity android:name=".ShowTemplateActivity"></activity>
+
+    </application>
+
+</manifest>
