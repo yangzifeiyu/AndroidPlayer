@@ -6,30 +6,40 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+import android.widget.EditText;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
+import com.example.mfusion.R;
 import com.example.mfusion.Schedule.ScheduleClass;
 import com.example.mfusion.ScheduleBlock.BlockItemClass;
 import com.example.mfusion.ScheduleBlock.ScheduleBlockClass;
 import com.example.mfusion.Template.TemplateDBclass;
 import com.example.mfusion.TemplateComponent.TemcompoClass;
 
+import java.io.File;
+
 /**
  * Created by WANG on 6/8/2016.
  */
 public class DBController extends SQLiteOpenHelper {
-    private static final String DataBase_Name = "MfusionDataBase.db";
+    public static final String DataBase_Name = "MfusionDataBase.db";
     private static final int DATABASE_VERSION = 1;
-    public static final String TABLE_NAME = "Schedule";
-    public static final String TABLE_NAME1 = "ScheduleBlock";
-    public static final String TABLE_NAME2 = "TemplateCompo";
-    public static final String TABLE_NAME3 = "Block_Item";
-    public static final String TABLE_NAME4 = "System_Settings";
-    public static final String TABLE_NAME5 = "Template";
+    private SQLiteDatabase db4;
+    public static final String APP_FOLDER = "/databases/";
+    private String sdPath;
+
+    private final String TAG = "DBController";
+    public static final String TABLE_NAME_COMPONENT = "component";
+    public static final String TABLE_NAME_TEMPLATE = "templates";
+
 
     public DBController(Context context, String s, Object o, int i) {
         super(context, DataBase_Name, null, DATABASE_VERSION);//specify the name,version,object
         Log.e("DATABASE OPERATIONS", "Database opened...");
+
+        sdPath= "/data/data/com.example.mfusion";
+        init();
     }
 
 
@@ -164,15 +174,25 @@ public class DBController extends SQLiteOpenHelper {
         contentValues.put("Wakeup", Wakeup);
         contentValues.put("Autostart", Autostart);
 
-
-        this.getWritableDatabase().insertOrThrow("System_Settings", "", contentValues);//insert value into the table
-
+        Cursor c = this.getReadableDatabase().rawQuery("SELECT * FROM System_Settings", null);
+        if(c.getCount()<1)
+        {
+            this.getWritableDatabase().insertOrThrow("System_Settings", "", contentValues);//insert value into the table
+        }
+        else if(c.getCount()==1)
+        {
+            while (c.moveToNext()) {
+                this.getWritableDatabase().execSQL("UPDATE System_Settings SET Display='"+Display+"',Password='"+Password+"',Shutdown='"+Shutdown+"',Wakeup='"+Wakeup+"', Autostart='"+Autostart+"'");
+            }
+        }
+        c.close();
     }
 
-    /*public void Update_IP(String old_IPAddress,String new_IPAddress){
+ /*public void Update_IP(String old_IPAddress,String new_IPAddress){
         this.getWritableDatabase().execSQL("UPDATE Syetem_Settings SET IPAddress='"+new_IPAddress+"' WHERE IPAddress='"+old_IPAddress+"'");
-
+ this.getWritableDatabase().execSQL("UPDATE System_Settings SET Display='"+Display+"',Wakeup='"+Wakeup+"' WHERE Display='"+Display+"'");
     }*/
+
 
     public void list_setting(TextView textView) {
         Cursor c = this.getReadableDatabase().rawQuery("SELECT * FROM System_Settings", null);
@@ -181,6 +201,8 @@ public class DBController extends SQLiteOpenHelper {
             textView.append(c.getString(1) + "" + c.getString(2) + "" + c.getString(3) + "" + c.getString(4) + "" + c.getString(5) + "\n");
         }//ensure that the cursor will move from start to the end(read all the data)
     }
+
+
 
 
     public void delete_setting() {
@@ -210,7 +232,7 @@ public class DBController extends SQLiteOpenHelper {
         }
 
         return password2;
-    }
+    }//get single entry
 
     public void InsertTemp(String tempId,String tempName,String tempWidth,String tempHeight, String tempBackColor,String tempBackImage, SQLiteDatabase db4) {
 
@@ -241,4 +263,102 @@ public class DBController extends SQLiteOpenHelper {
 
 
 
+    public void list_setting6(TextView textView, TextView textView2, EditText editText, RadioGroup radioButton, RadioGroup radioButton2) {
+        Cursor c = this.getReadableDatabase().rawQuery("SELECT * FROM System_Settings", null);
+        textView.setText("");
+        textView2.setText("");
+        editText.setText("");
+
+        while (c.moveToNext()) {
+
+            editText.setText(c.getString(2));
+            textView.setText(c.getString(3));
+            textView2.setText(c.getString(4));
+
+            if (c.getString(1).equals("Landscape"))
+            {
+                radioButton.check(R.id.landscape);
+            }
+
+            else if(c.getString(1).equals("Portrait"))
+            {
+                radioButton.check(R.id.portrait);
+            }
+
+
+            if (c.getString(5).equals("Yes"))
+            {
+                radioButton2.check(R.id.yes);
+            }
+
+            else if(c.getString(5).equals("No"))
+            {
+                radioButton2.check(R.id.no);
+            }
+
+        }//ensure that the cursor will move from start to the end(read all the data)
+    }
+
+    private void init() {
+        File appFolder = new File(sdPath + APP_FOLDER);
+        if (!appFolder.exists())
+            appFolder.mkdir();
+        try {
+            db4 = SQLiteDatabase.openDatabase(sdPath + APP_FOLDER + DataBase_Name, null, SQLiteDatabase.OPEN_READWRITE);
+        } catch (Exception ex) {
+            Log.e(TAG, "init: fail to open db" + ex.getMessage());
+        }
+        if (db4 == null) {
+
+            db4 = SQLiteDatabase.openOrCreateDatabase(sdPath + APP_FOLDER + DataBase_Name, null);
+
+            String createTemplateSql = "create table if not exists " + TABLE_NAME_TEMPLATE + " (id integer primary key autoincrement,name text)";
+            String createComponentSql = "create table if not exists " + TABLE_NAME_COMPONENT + " (id integer primary key autoincrement,left real,top real,right real,bottom real,tid integer)";
+            db4.beginTransaction();
+            db4.execSQL(createComponentSql);
+            db4.execSQL(createTemplateSql);
+            db4.setTransactionSuccessful();
+            db4.endTransaction();
+
+
+            String[] templates = {"insert into " + TABLE_NAME_TEMPLATE + " values(null,'First Template')",
+                    "insert into " + TABLE_NAME_TEMPLATE + " values(null,'Second Template')"};
+
+            String[] component = {"insert into " + TABLE_NAME_COMPONENT + " values(null,0,0,0.5,1,0)",
+                    "insert into " + TABLE_NAME_COMPONENT + " values(null,0.5,0.5,1,1,0)",
+                    "insert into " + TABLE_NAME_COMPONENT + " values(null,0.5,0,1,0.5,0)",
+
+                    "insert into " + TABLE_NAME_COMPONENT + " values(null,0,0,1,0.2,1)",
+                    "insert into " + TABLE_NAME_COMPONENT + " values(null,0,0.2,0.5,1,1)",
+                    "insert into " + TABLE_NAME_COMPONENT + " values(null,0.5,0.2,1,1,1)",
+
+                    "insert into " + TABLE_NAME_COMPONENT + " values(null,0,0,0.5,0.5,2)",
+                    "insert into " + TABLE_NAME_COMPONENT + " values(null,0.5,0,1,0.5,2)",
+                    "insert into " + TABLE_NAME_COMPONENT + " values(null,0,0.5,0.5,1,2)",
+                    "insert into " + TABLE_NAME_COMPONENT + " values(null,0.5,0.5,1,1,2)",
+
+                    "insert into " + TABLE_NAME_COMPONENT + " values(null,0,0,1,0.75,3)",
+                    "insert into " + TABLE_NAME_COMPONENT + " values(null,0,0.75,1,1,3)",
+
+                    "insert into " + TABLE_NAME_COMPONENT + " values(null,0,0,1,0.25,4)",
+                    "insert into " + TABLE_NAME_COMPONENT + " values(null,0,0.25,0.3,0.75,4)",
+                    "insert into " + TABLE_NAME_COMPONENT + " values(null,0.3,0.25,1,0.75,4)",
+                    "insert into " + TABLE_NAME_COMPONENT + " values(null,0,0.75,1,1,4)",
+
+                    "insert into " + TABLE_NAME_COMPONENT + " values(null,0,0,0.25,1,5)",
+                    "insert into " + TABLE_NAME_COMPONENT + " values(null,0.25,0,1,0.75,5)",
+                    "insert into " + TABLE_NAME_COMPONENT + " values(null,0.25,0.75,1,1,5)",};
+
+            db4.beginTransaction();
+            for (String current : templates)
+                db4.execSQL(current);
+            for (String current : component)
+                db4.execSQL(current);
+            db4.setTransactionSuccessful();
+            db4.endTransaction();
+
+        }
+
+
+}
 }
