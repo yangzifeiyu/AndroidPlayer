@@ -1,7 +1,6 @@
 package com.example.mfusion;
 
 import android.app.Activity;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -9,7 +8,6 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.VideoView;
 
@@ -18,8 +16,8 @@ import java.util.ArrayList;
 import com.example.mfusion.Utility.ScreenUtil;
 import com.example.mfusion.model.TemplateComponent;
 
-public class  ShowScreenActivity extends Activity {
-    private final String TAG="ShowScreenActivity";
+public class ShowScreenActivity extends Activity {
+     private final String TAG="ShowScreenActivity";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,9 +66,18 @@ public class  ShowScreenActivity extends Activity {
                     textView.setSingleLine(true);
                     layout.addView(textView);
                     break;
+                case TemplateComponent.TYPE_STATIC_TEXT:
+                    TextView staticTextView=new TextView(this);
+                    //textView.setBackgroundColor(Color.RED);
+                    staticTextView.setLayoutParams(params);
+
+                    staticTextView.setText(current.getSourceText());
+                    layout.addView(staticTextView);
+                    break;
                 case TemplateComponent.TYPE_VIDEO:
                     VideoView videoView=new VideoView(this);
                     //videoView.setBackgroundColor(Color.YELLOW);
+
                     videoView.setLayoutParams(params);
                     videoView.setVideoURI(current.getSourceUri());
                     videoView.start();
