@@ -11,8 +11,11 @@ import com.example.mfusion.model.MyTemplate;
 import com.example.mfusion.model.TemplateComponent;
 
 import java.util.ArrayList;
+import java.util.List;
 
-
+/**
+ * Created by JCYYYY on 2016/5/31.
+ */
 public class TemplateDAO {
     private static final String TAG = "TemplateDAO";
 
@@ -27,8 +30,8 @@ public class TemplateDAO {
         db=SQLiteDatabase.openOrCreateDatabase(sdPath+ DbIniter.APP_FOLDER+ DbIniter.DB_NAME,null);
     }
 
-    public  MyTemplate getMyTemplateById(int id) {
-        String selectComponent = "select left,top,right,bottom,id from " + DbIniter.TABLE_NAME_COMPONENT + " where tid=" + id;
+    public MyTemplate getMyTemplateById(int id) {
+        String selectComponent = "select left,top,right,bottom,tid,id from " + DbIniter.TABLE_NAME_COMPONENT + " where tid=" + id;
         Cursor result = db.rawQuery(selectComponent, null);
         ArrayList<TemplateComponent> componentList = new ArrayList<>();
 
@@ -39,6 +42,7 @@ public class TemplateDAO {
             float bottom = result.getFloat(3);
             TemplateComponent currentComponent = new TemplateComponent(context,left, top, right, bottom);
             currentComponent.setTid(result.getInt(4));
+            currentComponent.setId(result.getInt(5));
             componentList.add(currentComponent);
         }
         MyTemplate myTemplate = new MyTemplate();
@@ -46,7 +50,7 @@ public class TemplateDAO {
         myTemplate.setId(id);
         return myTemplate;
 
-    }//getTemplateByID
+    }
 
     public void updateMyTemplete(MyTemplate updatedTemplate) {
         ArrayList<TemplateComponent> components = updatedTemplate.getList();
@@ -64,41 +68,33 @@ public class TemplateDAO {
 
 
 
-    }// UpdateTemplate(component)
 
-    public void AddMyTemplate(MyTemplate AddTemplate) {
-        ArrayList<TemplateComponent> components = AddTemplate.getList();
-        for (TemplateComponent component : components) {
-            String uriStr = "";
-            if (component.getSourceUri() != null)
-                uriStr = component.getSourceUri().toString();
-            String addComponent = "Insert " + DbIniter.TABLE_NAME_COMPONENT + " set left= " + component.getLeft() + ",top= " + component.getTop() + ",right=" + component.getRight() + ",bottom= " + component.getBottom() + ",type=" + component.getType() + ",sourceUri= '" + uriStr + "',sourceText= '" + component.getSourceText() + "' where id=" + component.getTid();
-            Log.i(TAG, "AddMyTemplete: Insert component sql=" + addComponent);
+
+    }
+
+    public void createNewUserScreen(MyTemplate template){
+        List<TemplateComponent> components=template.getList();
+        String createScreenSql="insert into "+ DbIniter.TABLE_NAME_USER_SCREEN+" values(null,'"+template.getName()+"')";
+        Log.i(TAG, "createNewUserScreen: createScreenSql="+createScreenSql);
+        db.beginTransaction();
+        db.execSQL(createScreenSql);
+        db.setTransactionSuccessful();
+        db.endTransaction();
+
+        for(TemplateComponent current:components){
+            String uriStr="";
+            if(current.getSourceUri()!=null)
+                uriStr=current.getSourceUri().toString();
+
+            String createUserScreenComponentSql="insert into "+ DbIniter.TABLE_NAME_USER_SCREEN_COMPONENT+" values(null,"+current.getLeft()+","+current.getTop()+","+current.getRight()+","+current.getBottom()+","+template.getId()+","+current.getType()+",'"+uriStr+"','"+current.getSourceText()+"','"+current.getFontType()+"',"+current.getFontSize()+",'"+current.getFontColor()+"',"+current.getFontStyle()+")";
+            Log.i(TAG, "createNewUserScreen: createUserScreenComponentSql="+createUserScreenComponentSql);
             db.beginTransaction();
-            db.execSQL(addComponent);
+            db.execSQL(createUserScreenComponentSql);
             db.setTransactionSuccessful();
             db.endTransaction();
         }
+    }
 
 
 
-    }//AddTemplate( for now)
-
-    public void DeleteMyTemplate(MyTemplate AddTemplate) {
-        ArrayList<TemplateComponent> components = AddTemplate.getList();
-        for (TemplateComponent component : components) {
-            String uriStr = "";
-            if (component.getSourceUri() != null)
-                uriStr = component.getSourceUri().toString();
-            String DeleteComponent = "D " + DbIniter.TABLE_NAME_COMPONENT + " set left= " + component.getLeft() + ",top= " + component.getTop() + ",right=" + component.getRight() + ",bottom= " + component.getBottom() + ",type=" + component.getType() + ",sourceUri= '" + uriStr + "',sourceText= '" + component.getSourceText() + "' where id=" + component.getTid();
-            Log.i(TAG, "DeleteMyTemplete: Delete component sql=" + DeleteComponent);
-            db.beginTransaction();
-            db.execSQL(DeleteComponent);
-            db.setTransactionSuccessful();
-            db.endTransaction();
-        }
-
-
-
-    }//DeleteTemplate( for now)
 }
