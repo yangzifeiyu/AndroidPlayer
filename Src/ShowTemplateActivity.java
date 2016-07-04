@@ -23,38 +23,56 @@ import android.widget.VideoView;
 import com.einmalfel.earl.EarlParser;
 import com.einmalfel.earl.Feed;
 import com.einmalfel.earl.Item;
-import com.example.mfusion.Template.TemplateDAO;
-import com.example.mfusion.Template.TemplateViewNew;
-import com.example.mfusion.model.MyTemplate;
-import com.example.mfusion.model.TemplateComponent;
 
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.zip.DataFormatException;
+
+import com.example.mfusion.Template.TemplateDAO;
+import com.example.mfusion.Template.TemplateViewNew;
+import com.example.mfusion.Template.ViewImageProcessor;
+import com.example.mfusion.Template.ViewProcessor;
+import com.example.mfusion.Template.ViewStaticTextProcessor;
+import com.example.mfusion.Template.ViewTickerTextProcessor;
+import com.example.mfusion.Template.ViewVideoProcessor;
+import com.example.mfusion.model.MyTemplate;
+import com.example.mfusion.model.TemplateComponent;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 public class ShowTemplateActivity extends Activity {
 
     private final String TAG="ShowTemplateActivity";
+    private static final int RESIZE_PERCENTAGE=6;
     private final int PICK_IMAGE=1;
     private final int PICK_VIDEO=2;
+    private final int EDIT_TEXT_PROP=3;
     private TemplateViewNew templateViewNew;
     private TemplateDAO db;
     private Uri imgUri;
     private Uri videoUri;
 
     private FrameLayout frameLayout;
-    private ImageView imageView;
-    private ImageView imgEdit;
-    private ImageView imgSave,imgAdd,imgDelete;
+    @BindView(R.id.imgPreview) ImageView imgPreview;
+    @BindView(R.id.imgEdit) ImageView imgEdit;
+    @BindView(R.id.imgSave) ImageView imgSave;
+    @BindView(R.id.imgDelete)ImageView imgDelete;
+    @BindView(R.id.imgSaveAs)ImageView imgSaveAs;
 
     private boolean editMode;
     private boolean imgClick;
 
     private HashMap<Integer,View> viewRefMap;
+
+    private String weatherCity;
+    private String lineSeparator;
 
 
     @Override
@@ -64,15 +82,21 @@ public class ShowTemplateActivity extends Activity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_show_template);
+        ButterKnife.bind(this);
+        imgEdit.setImageBitmap(ImageUtil.resizeImage(this,R.drawable.edit_btn,RESIZE_PERCENTAGE));
+        imgPreview.setImageBitmap(ImageUtil.resizeImage(this,R.drawable.preview_btn,RESIZE_PERCENTAGE));
+        imgSave.setImageBitmap(ImageUtil.resizeImage(this,R.drawable.save,RESIZE_PERCENTAGE));
+        imgSaveAs.setImageBitmap(ImageUtil.resizeImage(this,R.drawable.save_as,RESIZE_PERCENTAGE));
+        imgDelete.setImageBitmap(ImageUtil.resizeImage(this,R.drawable.delete_btn,RESIZE_PERCENTAGE));
 
         templateViewNew=(TemplateViewNew) findViewById(R.id.show_template_my_view);
         frameLayout=(FrameLayout)findViewById(R.id.show_template_frame_layout);
-        imageView=(ImageView)findViewById(R.id.imgPreview);
-        imgEdit=(ImageView)findViewById(R.id.imgEdit);
-        imgSave=(ImageView)findViewById(R.id.imgSave);
-        imgAdd=(ImageView)findViewById(R.id.imgAdd);
-        imgDelete=(ImageView)findViewById(R.id.imgDelete);
+//        imgPreview=(ImageView)findViewById(R.id.imgPreview);
+//        imgEdit=(ImageView)findViewById(R.id.imgEdit);
+//        imgSave=(ImageView)findViewById(R.id.imgSave);
         db=new TemplateDAO(this);
+        lineSeparator=System.getProperty("line.separator");
+
         viewRefMap=new HashMap<>();
 
         int tid=getIntent().getExtras().getInt("tid");
@@ -109,7 +133,7 @@ public class ShowTemplateActivity extends Activity {
                 builder.setTitle("Select content for Area "+templateViewNew.getAreaTouched());
                 builder.setItems(new String[]{"Video","Ticker Text","Image","Date & Time","Weather","RSS"}, new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialog, int which) {
+                    public void onClick(DialogInterface dialog, final int which) {
                         switch (which){
                             case 0:
                                 Intent intentVideo = new Intent(Intent.ACTION_GET_CONTENT);
@@ -125,8 +149,15 @@ public class ShowTemplateActivity extends Activity {
                                 textDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
+                                        Intent goEditTextProp=new Intent(ShowTemplateActivity.this,EditTextPropertyActivity.class);
+                                        goEditTextProp.putExtra("component",templateViewNew.getComponentById(templateViewNew.getAreaTouched()));
+                                        startActivityForResult(goEditTextProp,EDIT_TEXT_PROP);
+
                                         templateViewNew.setComponentDetail(templateViewNew.getAreaTouched(), TemplateComponent.TYPE_TEXT,null,editText.getText().toString());
-                                        setText();
+                                        ViewTickerTextProcessor tickerTextProcessor=new ViewTickerTextProcessor(ShowTemplateActivity.this,templateViewNew.getComponentById(templateViewNew.getAreaTouched()));
+                                        if(tickerTextProcessor.getOldView()!=null)
+                                            frameLayout.removeView(tickerTextProcessor.getOldView());
+                                        frameLayout.addView(tickerTextProcessor.generateView());
                                     }
                                 });
                                 textDialogBuilder.show();
@@ -139,14 +170,55 @@ public class ShowTemplateActivity extends Activity {
 
                                 break;
                             case 3:
+                                final TextView dateView=new TextView(ShowTemplateActivity.this);
+                                long date = System.currentTimeMillis();
+                                SimpleDateFormat simpleDateFormat=new SimpleDateFormat("MMM MM dd \r\nyyyy h:mm a");
+                                String dateString=simpleDateFormat.format(date);
+                                dateView.setText(dateString);
 
+                                templateViewNew.setComponentDetail(templateViewNew.getAreaTouched(), TemplateComponent.TYPE_TEXT,null,dateView.getText().toString());
+                                ViewStaticTextProcessor staticTextProcessor=new ViewStaticTextProcessor(ShowTemplateActivity.this,templateViewNew.getComponentById(templateViewNew.getAreaTouched()));
+                                if(staticTextProcessor.getOldView()!=null)
+                                    frameLayout.removeView(staticTextProcessor.getOldView());
+                                frameLayout.addView(staticTextProcessor.generateView());
+
+
+
+                                break;
+
+                            case  4:
+                                AlertDialog.Builder weatherBuilder=new AlertDialog.Builder(ShowTemplateActivity.this);
+                                weatherBuilder.setTitle("Enter your city");
+                                final EditText etWeather=new EditText(ShowTemplateActivity.this);
+                                etWeather.setText("singapore");
+                                weatherBuilder.setView(etWeather);
+                                weatherBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        WeatherReader reader=new WeatherReader(ShowTemplateActivity.this, etWeather.getText().toString(), new WeatherReader.WeatherReaderListener() {
+                                            @Override
+                                            public void onReady(WeatherJsonWrapper wrapper) {
+                                                String weatherInfo="Temperature :"+wrapper.info[0].now.tmp+" Celsius"+lineSeparator+"Humidity :"+wrapper.info[0].now.hum+lineSeparator
+                                                        +"Weather :"+wrapper.info[0].now.cond.txt+lineSeparator
+                                                        +"Wind :"+wrapper.info[0].now.wind.deg+lineSeparator;
+                                                templateViewNew.setComponentDetail(templateViewNew.getAreaTouched(),TemplateComponent.TYPE_STATIC_TEXT,null,weatherInfo);
+                                                ViewStaticTextProcessor staticTextProcessor=new ViewStaticTextProcessor(ShowTemplateActivity.this,templateViewNew.getComponentById(templateViewNew.getAreaTouched()));
+                                                if(staticTextProcessor.getOldView()!=null)
+                                                    frameLayout.removeView(staticTextProcessor.getOldView());
+                                                frameLayout.addView(staticTextProcessor.generateView());
+                                            }
+                                        });
+                                        reader.call();
+                                    }
+                                });
+                                weatherBuilder.show();
 
                                 break;
                             case 5:
                                 AlertDialog.Builder rssAddrDialogBuilder=new AlertDialog.Builder(ShowTemplateActivity.this);
                                 rssAddrDialogBuilder.setTitle("Enter RSS Feed addresss");
                                 final EditText rssEditText=new EditText(ShowTemplateActivity.this);
-                                rssEditText.setText("http://rss.cnn.com/rss/edition.rss");
+//                                rssEditText.setText("http://rss.cnn.com/rss/edition.rss");
                                 rssAddrDialogBuilder.setView(rssEditText);
                                 rssAddrDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                     @Override
@@ -171,20 +243,8 @@ public class ShowTemplateActivity extends Activity {
             }
         });
 
-//        templateView.setOnLongClickListener(new View.OnLongClickListener() {
-//            @Override
-//            public boolean onLongClick(View v) {
-//                Intent goShowScreen=new Intent(ShowTemplateActivity.this,ShowScreenActivity.class);
-//                Bundle bundle=new Bundle();
-//                bundle.putParcelableArrayList("list",templateView.getComponentList());
-//                goShowScreen.putExtra("bundle",bundle);
-//
-//                startActivity(goShowScreen);
-//
-//                return false;
-//            }
-//        });
-        imageView.setOnClickListener(new View.OnClickListener() {
+
+        imgPreview.setOnClickListener(new View.OnClickListener() {
 
 
             @Override
@@ -206,101 +266,109 @@ public class ShowTemplateActivity extends Activity {
 
             @Override
             public void onClick(View view) {
-                db.updateMyTemplete(selectedTemplate);
 
-            }
-        });
+                AlertDialog.Builder builder=new AlertDialog.Builder(ShowTemplateActivity.this);
+                builder.setTitle("Name Your Screen");
+                final EditText etScreenName=new EditText(ShowTemplateActivity.this);
+                builder.setView(etScreenName);
+                builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        selectedTemplate.setName(etScreenName.getText().toString());
+                        db.createNewUserScreen(selectedTemplate);
+                    }
+                });
+                builder.show();
 
-        imgAdd.setOnClickListener(new View.OnClickListener(){
-
-
-            @Override
-            public void onClick(View view) {
-                db.AddMyTemplate(selectedTemplate);
-
-            }
-        });
-
-
-
-        imgDelete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (imgClick){
-                    Toast.makeText(getApplicationContext(), "Delete Template", Toast.LENGTH_LONG).show();
-                    templateViewNew.setEditMode(true);
-                    db.DeleteMyTemplate(selectedTemplate);
-                    imgClick=false;
-
-                }else {
-                    Toast.makeText(getApplicationContext(), "Delete components", Toast.LENGTH_LONG).show();
-                    templateViewNew.setEditMode(false);
-                    db.DeleteMyTemplate(selectedTemplate);
-                    imgClick=true;
-                }
 
             }
         });
 
 
-    }
 
-    private void setVideo(){
-        VideoView videoView=new VideoView(ShowTemplateActivity.this);
-        TemplateComponent currentComponent=templateViewNew.getComponentById(templateViewNew.getAreaTouched());
-        int width=currentComponent.getResolvedRight()-currentComponent.getResolvedLeft();
-        int height=currentComponent.getResolvedBottom()-currentComponent.getResolvedTop();
-        FrameLayout.LayoutParams paras=new FrameLayout.LayoutParams(width,height);
-        paras.setMargins(currentComponent.getResolvedLeft(),currentComponent.getResolvedTop(),currentComponent.getResolvedRight(),currentComponent.getResolvedBottom());
-        videoView.setLayoutParams(paras);
-        videoView.setVideoURI(currentComponent.getSourceUri());
-        frameLayout.addView(videoView);
 
-        removePreviousViewIfExist();
-        viewRefMap.put(templateViewNew.getAreaTouched(),videoView);
-        videoView.start();
-    }
 
-    private void setImage(){
-        ImageView imageView=new ImageView(ShowTemplateActivity.this);
-        TemplateComponent currentComponent=templateViewNew.getComponentById(templateViewNew.getAreaTouched());
-        int width=currentComponent.getResolvedRight()-currentComponent.getResolvedLeft();
-        int height=currentComponent.getResolvedBottom()-currentComponent.getResolvedTop();
-        FrameLayout.LayoutParams paras=new FrameLayout.LayoutParams(width,height);
-        paras.setMargins(currentComponent.getResolvedLeft(),currentComponent.getResolvedTop(),currentComponent.getResolvedRight(),currentComponent.getResolvedBottom());
-        imageView.setLayoutParams(paras);
-        imageView.setImageURI(currentComponent.getSourceUri());
-        frameLayout.addView(imageView);
-
-        removePreviousViewIfExist();
-        viewRefMap.put(templateViewNew.getAreaTouched(),imageView);
-
-    }
-    private void setText(){
-        TextView textView=new TextView(ShowTemplateActivity.this);
-        TemplateComponent currentComponent=templateViewNew.getComponentById(templateViewNew.getAreaTouched());
-        int width=currentComponent.getResolvedRight()-currentComponent.getResolvedLeft();
-        int height=currentComponent.getResolvedBottom()-currentComponent.getResolvedTop();
-        FrameLayout.LayoutParams paras=new FrameLayout.LayoutParams(width,height);
-        paras.setMargins(currentComponent.getResolvedLeft(),currentComponent.getResolvedTop(),currentComponent.getResolvedRight(),currentComponent.getResolvedBottom());
-        textView.setLayoutParams(paras);
-        textView.setText(currentComponent.getSourceText());
-        textView.setEllipsize(TextUtils.TruncateAt.MARQUEE);
-        textView.setSelected(true);
-        textView.setSingleLine(true);
-        frameLayout.addView(textView);
-
-        removePreviousViewIfExist();
-        viewRefMap.put(templateViewNew.getAreaTouched(),textView);
 
 
     }
 
-    private void removePreviousViewIfExist(){
-        TemplateComponent current=templateViewNew.getComponentById(templateViewNew.getAreaTouched());
-        if(current.getSourceUri()!=null||current.getSourceText()!=null)
-            frameLayout.removeView(viewRefMap.get(templateViewNew.getAreaTouched()));
-    }
+//    private FrameLayout.LayoutParams getParas(TemplateComponent currentComponent){
+//        int width=currentComponent.getResolvedRight()-currentComponent.getResolvedLeft();
+//        int height=currentComponent.getResolvedBottom()-currentComponent.getResolvedTop();
+//        FrameLayout.LayoutParams paras=new FrameLayout.LayoutParams(width,height);
+//        paras.setMargins(currentComponent.getResolvedLeft(),currentComponent.getResolvedTop(),currentComponent.getResolvedRight(),currentComponent.getResolvedBottom());
+//        return paras;
+//    }
+
+//    private void setStaticText(){
+//        TemplateComponent component=templateViewNew.getComponentById(templateViewNew.getAreaTouched());
+//        TextView textView=new TextView(this);
+//        textView.setLayoutParams(getParas(component));
+//        textView.setText(component.getSourceText());
+//        frameLayout.addView(textView);
+//        removePreviousViewIfExist();
+//        viewRefMap.put(templateViewNew.getAreaTouched(),textView);
+//
+//    }
+
+//    private void setVideo(){
+//        VideoView videoView=new VideoView(ShowTemplateActivity.this);
+//        TemplateComponent currentComponent=templateViewNew.getComponentById(templateViewNew.getAreaTouched());
+//        int width=currentComponent.getResolvedRight()-currentComponent.getResolvedLeft();
+//        int height=currentComponent.getResolvedBottom()-currentComponent.getResolvedTop();
+//        FrameLayout.LayoutParams paras=new FrameLayout.LayoutParams(width,height);
+//        paras.setMargins(currentComponent.getResolvedLeft(),currentComponent.getResolvedTop(),currentComponent.getResolvedRight(),currentComponent.getResolvedBottom());
+//        videoView.setLayoutParams(paras);
+//        videoView.setVideoURI(currentComponent.getSourceUri());
+//        frameLayout.addView(videoView);
+//
+//        removePreviousViewIfExist();
+//        viewRefMap.put(templateViewNew.getAreaTouched(),videoView);
+//        videoView.start();
+//    }
+
+//    private void setImage(){
+//        ImageView imageView=new ImageView(ShowTemplateActivity.this);
+//        TemplateComponent currentComponent=templateViewNew.getComponentById(templateViewNew.getAreaTouched());
+//        int width=currentComponent.getResolvedRight()-currentComponent.getResolvedLeft();
+//        int height=currentComponent.getResolvedBottom()-currentComponent.getResolvedTop();
+//        FrameLayout.LayoutParams paras=new FrameLayout.LayoutParams(width,height);
+//        paras.setMargins(currentComponent.getResolvedLeft(),currentComponent.getResolvedTop(),currentComponent.getResolvedRight(),currentComponent.getResolvedBottom());
+//        imageView.setLayoutParams(paras);
+//        imageView.setImageURI(currentComponent.getSourceUri());
+//        frameLayout.addView(imageView);
+//
+//        removePreviousViewIfExist();
+//        viewRefMap.put(templateViewNew.getAreaTouched(),imageView);
+//
+//    }
+//    private void setText(){
+//        TextView textView=new TextView(ShowTemplateActivity.this);
+//        TemplateComponent currentComponent=templateViewNew.getComponentById(templateViewNew.getAreaTouched());
+//        int width=currentComponent.getResolvedRight()-currentComponent.getResolvedLeft();
+//        int height=currentComponent.getResolvedBottom()-currentComponent.getResolvedTop();
+//        FrameLayout.LayoutParams paras=new FrameLayout.LayoutParams(width,height);
+//        paras.setMargins(currentComponent.getResolvedLeft(),currentComponent.getResolvedTop(),currentComponent.getResolvedRight(),currentComponent.getResolvedBottom());
+//        textView.setLayoutParams(paras);
+//        textView.setText(currentComponent.getSourceText());
+//        textView.setEllipsize(TextUtils.TruncateAt.MARQUEE);
+//        textView.setSelected(true);
+//        textView.setSingleLine(true);
+//        frameLayout.addView(textView);
+//
+//        removePreviousViewIfExist();
+//        viewRefMap.put(templateViewNew.getAreaTouched(),textView);
+//
+//
+//    }
+
+//    private void removePreviousViewIfExist(){
+//        TemplateComponent current=templateViewNew.getComponentById(templateViewNew.getAreaTouched());
+//        if(current.getSourceUri()!=null||current.getSourceText()!=null)
+//            frameLayout.removeView(viewRefMap.get(templateViewNew.getAreaTouched()));
+//    }
+
+
 
 
 
@@ -315,10 +383,13 @@ public class ShowTemplateActivity extends Activity {
             }
             imgUri = data.getData();
             templateViewNew.setComponentDetail(templateViewNew.getAreaTouched(),TemplateComponent.TYPE_IMAGE,imgUri,"Image Uri "+imgUri.getPath());
-
-            if (templateViewNew.getComponentById(templateViewNew.getAreaTouched()).getType()==TemplateComponent.TYPE_IMAGE){
-                setImage();
-            }
+            ViewImageProcessor imageProcessor=new ViewImageProcessor(this,templateViewNew.getComponentById(templateViewNew.getAreaTouched()));
+            if(imageProcessor.getOldView()!=null)
+                frameLayout.removeView(imageProcessor.getOldView());
+            frameLayout.addView(imageProcessor.generateImageView());
+//            if (templateViewNew.getComponentById(templateViewNew.getAreaTouched()).getType()==TemplateComponent.TYPE_IMAGE){
+//                setImage();
+//            }
 
         }
 
@@ -329,10 +400,13 @@ public class ShowTemplateActivity extends Activity {
             }
             videoUri= data.getData();
             templateViewNew.setComponentDetail(templateViewNew.getAreaTouched(),TemplateComponent.TYPE_VIDEO,videoUri,"Video Uri "+videoUri.getPath());
-
-            if(templateViewNew.getComponentById(templateViewNew.getAreaTouched()).getType()==TemplateComponent.TYPE_VIDEO){
-                setVideo();
-            }
+            ViewVideoProcessor videoProcessor=new ViewVideoProcessor(this,templateViewNew.getComponentById(templateViewNew.getAreaTouched()));
+            if(videoProcessor.getOldView()!=null)
+                frameLayout.removeView(videoProcessor.getOldView());
+            frameLayout.addView(videoProcessor.generateView());
+//            if(templateViewNew.getComponentById(templateViewNew.getAreaTouched()).getType()==TemplateComponent.TYPE_VIDEO){
+//                setVideo();
+//            }
 
         }
     }
@@ -367,7 +441,10 @@ public class ShowTemplateActivity extends Activity {
         @Override
         protected void onPostExecute(String s) {
             templateViewNew.setComponentDetail(templateViewNew.getAreaTouched(),TemplateComponent.TYPE_TEXT,null,s);
-            setText();
+            ViewTickerTextProcessor tickerTextProcessor=new ViewTickerTextProcessor(ShowTemplateActivity.this,templateViewNew.getComponentById(templateViewNew.getAreaTouched()));
+            if(tickerTextProcessor.getOldView()!=null)
+                frameLayout.removeView(tickerTextProcessor.getOldView());
+            frameLayout.addView(tickerTextProcessor.generateView());
 
         }
     }
