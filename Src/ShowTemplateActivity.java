@@ -134,124 +134,127 @@ public class ShowTemplateActivity extends Activity {
             public void onClick(final View v) {
 //                Log.i(TAG, "onClick: templateview onclick triggered, clicked area="+templateView.getAreaSelectedIndex());
                 //templateView.setComponentDetail(1,1,null,"abc");
-                AlertDialog.Builder builder=new AlertDialog.Builder(ShowTemplateActivity.this);
-                builder.setTitle("Select Component");
-                builder.setItems(new String[]{"Video","Ticker Text","Image","Date & Time","Weather","RSS"}, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, final int which) {
-                        switch (which){
-                            case 0:
-                                Intent intentVideo = new Intent(Intent.ACTION_GET_CONTENT);
-                                intentVideo.setType("video/*");
-                                startActivityForResult(intentVideo, PICK_VIDEO);
+                if(templateViewNew.getAreaTouched()>-1){
+                    AlertDialog.Builder builder=new AlertDialog.Builder(ShowTemplateActivity.this);
+                    builder.setTitle("Select Component");
+                    builder.setItems(new String[]{"Video","Ticker Text","Image","Date & Time","Weather","RSS"}, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, final int which) {
+                            switch (which){
+                                case 0:
+                                    Intent intentVideo = new Intent(Intent.ACTION_GET_CONTENT);
+                                    intentVideo.setType("video/*");
+                                    startActivityForResult(intentVideo, PICK_VIDEO);
 
-                                break;
-                            case 1:
+                                    break;
+                                case 1:
 
-                                Intent goEditTextProp = new Intent(ShowTemplateActivity.this, EditTextPropertyActivity.class);
-                                TemplateComponent selected=templateViewNew.getComponentById(templateViewNew.getAreaTouched());
-                                selected.setType(TemplateComponent.TYPE_TEXT);
-                                goEditTextProp.putExtra("component",selected );
-                                startActivityForResult(goEditTextProp, EDIT_TEXT_PROP);
+                                    Intent goEditTextProp = new Intent(ShowTemplateActivity.this, EditTextPropertyActivity.class);
+                                    TemplateComponent selected=templateViewNew.getComponentById(templateViewNew.getAreaTouched());
+                                    selected.setType(TemplateComponent.TYPE_TEXT);
+                                    goEditTextProp.putExtra("component",selected );
+                                    startActivityForResult(goEditTextProp, EDIT_TEXT_PROP);
 
-                                break;
-                            case 2:
-                                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                                intent.setType("image/*");
-                                startActivityForResult(intent, PICK_IMAGE);
+                                    break;
+                                case 2:
+                                    Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                                    intent.setType("image/*");
+                                    startActivityForResult(intent, PICK_IMAGE);
 
-                                break;
-                            case 3:
+                                    break;
+                                case 3:
 
-                                long date = System.currentTimeMillis();
-                                final SimpleDateFormat simpleDateFormat=new SimpleDateFormat("MMM dd yyyy "+lineSeparator+"h:mm:ss a");
-                                String dateString=simpleDateFormat.format(date);
+                                    long date = System.currentTimeMillis();
+                                    final SimpleDateFormat simpleDateFormat=new SimpleDateFormat("MMM dd yyyy "+lineSeparator+"h:mm:ss a");
+                                    String dateString=simpleDateFormat.format(date);
 
 
-                                templateViewNew.setComponentDetail(templateViewNew.getAreaTouched(), TemplateComponent.TYPE_DATE,null,dateString);
-                                ViewStaticTextProcessor staticTextProcessor=new ViewStaticTextProcessor(ShowTemplateActivity.this,templateViewNew.getComponentById(templateViewNew.getAreaTouched()));
-                                staticTextProcessor.addOrUpdateLayout(frameLayout);
-                                final TextView dateView=(TextView) staticTextProcessor.getOldView();
-                                dateHandler = new Handler(){
-                                    @Override
-                                    public void handleMessage(Message msg) {
-                                        super.handleMessage(msg);
-                                        if(msg.arg1==1)
-                                            dateView.setText(simpleDateFormat.format(new Date()));
-                                    }
-                                };
-                                new Thread(){
-                                    @Override
-                                    public void run() {
-                                        super.run();
-                                        while(true){
-                                            Message msg=dateHandler.obtainMessage();
-                                            msg.arg1=1;
-                                            dateHandler.sendMessage(msg);
-                                            try {
-                                                sleep(1000);
-                                            } catch (InterruptedException e) {
-                                                e.printStackTrace();
+                                    templateViewNew.setComponentDetail(templateViewNew.getAreaTouched(), TemplateComponent.TYPE_DATE,null,dateString);
+                                    ViewStaticTextProcessor staticTextProcessor=new ViewStaticTextProcessor(ShowTemplateActivity.this,templateViewNew.getComponentById(templateViewNew.getAreaTouched()));
+                                    staticTextProcessor.addOrUpdateLayout(frameLayout);
+                                    final TextView dateView=(TextView) staticTextProcessor.getOldView();
+                                    dateHandler = new Handler(){
+                                        @Override
+                                        public void handleMessage(Message msg) {
+                                            super.handleMessage(msg);
+                                            if(msg.arg1==1)
+                                                dateView.setText(simpleDateFormat.format(new Date()));
+                                        }
+                                    };
+                                    new Thread(){
+                                        @Override
+                                        public void run() {
+                                            super.run();
+                                            while(true){
+                                                Message msg=dateHandler.obtainMessage();
+                                                msg.arg1=1;
+                                                dateHandler.sendMessage(msg);
+                                                try {
+                                                    sleep(1000);
+                                                } catch (InterruptedException e) {
+                                                    e.printStackTrace();
+                                                }
                                             }
                                         }
-                                    }
-                                }.start();
+                                    }.start();
 
 
 
-                                break;
+                                    break;
 
-                            case  4:
-                                AlertDialog.Builder weatherBuilder=new AlertDialog.Builder(ShowTemplateActivity.this);
-                                weatherBuilder.setTitle("Enter your city");
-                                final EditText etWeather=new EditText(ShowTemplateActivity.this);
-                                etWeather.setText("singapore");
-                                weatherBuilder.setView(etWeather);
-                                weatherBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        WeatherReader reader=new WeatherReader(ShowTemplateActivity.this, etWeather.getText().toString(), new WeatherReader.WeatherReaderListener() {
-                                            @Override
-                                            public void onReady(WeatherJsonWrapper wrapper) {
-                                                String weatherInfo="Temperature :"+wrapper.info[0].now.tmp+" Celsius"+lineSeparator+"Humidity :"+wrapper.info[0].now.hum+lineSeparator
-                                                        +"Weather :"+wrapper.info[0].now.cond.txt+lineSeparator
-                                                        +"Wind :"+wrapper.info[0].now.wind.deg+lineSeparator;
-                                                templateViewNew.setComponentDetail(templateViewNew.getAreaTouched(),TemplateComponent.TYPE_STATIC_TEXT,null,weatherInfo);
-                                                ViewStaticTextProcessor staticTextProcessor=new ViewStaticTextProcessor(ShowTemplateActivity.this,templateViewNew.getComponentById(templateViewNew.getAreaTouched()));
-                                                staticTextProcessor.addOrUpdateLayout(frameLayout);
-                                            }
-                                        });
-                                        reader.call();
-                                    }
-                                });
-                                weatherBuilder.show();
+                                case  4:
+                                    AlertDialog.Builder weatherBuilder=new AlertDialog.Builder(ShowTemplateActivity.this);
+                                    weatherBuilder.setTitle("Enter your city");
+                                    final EditText etWeather=new EditText(ShowTemplateActivity.this);
+                                    etWeather.setText("singapore");
+                                    weatherBuilder.setView(etWeather);
+                                    weatherBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            WeatherReader reader=new WeatherReader(ShowTemplateActivity.this, etWeather.getText().toString(), new WeatherReader.WeatherReaderListener() {
+                                                @Override
+                                                public void onReady(WeatherJsonWrapper wrapper) {
+                                                    String weatherInfo="Temperature :"+wrapper.info[0].now.tmp+" Celsius"+lineSeparator+"Humidity :"+wrapper.info[0].now.hum+lineSeparator
+                                                            +"Weather :"+wrapper.info[0].now.cond.txt+lineSeparator
+                                                            +"Wind :"+wrapper.info[0].now.wind.deg+lineSeparator;
+                                                    templateViewNew.setComponentDetail(templateViewNew.getAreaTouched(),TemplateComponent.TYPE_STATIC_TEXT,null,weatherInfo);
+                                                    ViewStaticTextProcessor staticTextProcessor=new ViewStaticTextProcessor(ShowTemplateActivity.this,templateViewNew.getComponentById(templateViewNew.getAreaTouched()));
+                                                    staticTextProcessor.addOrUpdateLayout(frameLayout);
+                                                }
+                                            });
+                                            reader.call();
+                                        }
+                                    });
+                                    weatherBuilder.show();
 
-                                break;
-                            case 5:
-                                AlertDialog.Builder rssAddrDialogBuilder=new AlertDialog.Builder(ShowTemplateActivity.this);
-                                rssAddrDialogBuilder.setTitle("Enter RSS Feed addresss");
-                                final EditText rssEditText=new EditText(ShowTemplateActivity.this);
-                                rssEditText.setText("http://rss.cnn.com/rss/edition.rss");
-                                rssAddrDialogBuilder.setView(rssEditText);
-                                rssAddrDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
+                                    break;
+                                case 5:
+                                    AlertDialog.Builder rssAddrDialogBuilder=new AlertDialog.Builder(ShowTemplateActivity.this);
+                                    rssAddrDialogBuilder.setTitle("Enter RSS Feed addresss");
+                                    final EditText rssEditText=new EditText(ShowTemplateActivity.this);
+                                    rssEditText.setText("http://rss.cnn.com/rss/edition.rss");
+                                    rssAddrDialogBuilder.setView(rssEditText);
+                                    rssAddrDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
 
-                                        String address=rssEditText.getText().toString();
+                                            String address=rssEditText.getText().toString();
 
-                                        new RssWorker().execute(address);
+                                            new RssWorker().execute(address);
 
-                                    }
-                                });
-                                rssAddrDialogBuilder.show();
+                                        }
+                                    });
+                                    rssAddrDialogBuilder.show();
 
-                                break;
+                                    break;
 
 
+                            }
                         }
-                    }
-                });
-                builder.show();
+                    });
+                    builder.show();
+
+                }
 
             }
         });
