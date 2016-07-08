@@ -2,9 +2,7 @@ package com.example.mfusion.model;
 
 import java.util.ArrayList;
 
-/**
- * Created by JCYYYY on 2016/5/26.
- */
+
 public class MyTemplate {
     private ArrayList<TemplateComponent> list;
     private static int pointer=-1;
