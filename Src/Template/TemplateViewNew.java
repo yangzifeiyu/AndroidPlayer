@@ -17,6 +17,7 @@ import com.example.mfusion.model.TemplateComponent;
 
 public class TemplateViewNew extends View {
     private static final String TAG = "TemplateViewNew";
+    private final String lineSeparator=System.getProperty("line.separator");
     private static final int EDITING_LEFT=1;
     private static final int EDITING_TOP=2;
     private static final int EDITING_RIGHT=3;
@@ -29,12 +30,20 @@ public class TemplateViewNew extends View {
     private static final int TOUCH_TIME_THRESHOLD=100;
     
     private Paint boundaryPaint;
-    private Paint textPaint;
+    private Paint sizeValueTextPaint;
     private Paint boundaryPaintSelected;
+    private Paint sizeValueOverlapBoxPaint;
+
+    private static final float SIZE_VALUE_TEXT=50f;
+    private static final float SIZE_VALUE_TEXT_SPACE=10f;
+
+
 
     private int areaTouched;
-    private int areaSelected;
-    private boolean touched;
+    private int areaSelectedIndex;
+    private boolean areaSelected;
+
+    private boolean fingerOnScreen;
 
     private Context context;
 
@@ -68,20 +77,28 @@ public class TemplateViewNew extends View {
         boundaryPaint.setStrokeWidth(3f);
 
 
-        textPaint = new Paint();
-        textPaint.setColor(Color.BLACK);
-        textPaint.setTextSize(50f);
+        sizeValueTextPaint = new Paint();
+        sizeValueTextPaint.setColor(Color.BLACK);
+        sizeValueTextPaint.setTextSize(SIZE_VALUE_TEXT);
 
         boundaryPaintSelected=new Paint();
         boundaryPaintSelected.setColor(Color.RED);
         boundaryPaintSelected.setStyle(Paint.Style.STROKE);
         boundaryPaintSelected.setStrokeWidth(6f);
 
-        areaSelected =-1;
+        sizeValueOverlapBoxPaint =new Paint();
+        sizeValueOverlapBoxPaint.setColor(Color.parseColor("#00ccff"));
+
+
+
+
+        areaSelectedIndex =-1;
 
         editMode=false;
+        fingerOnScreen=false;
 
         this.context=context;
+        components=new ArrayList<>();
 
     }
 
@@ -101,8 +118,9 @@ public class TemplateViewNew extends View {
             switch (action){
                 case MotionEvent.ACTION_DOWN:
                     Log.i(TAG, "onTouchEvent: action down fired");
+                    fingerOnScreen=true;
                     //record shift paras for shifting action
-                    if(areaSelected >=0){
+                    if(areaSelectedIndex >=0){
                         recordShiftParasInPercentage(x,y);
                     }
 
@@ -110,7 +128,7 @@ public class TemplateViewNew extends View {
                     startTime =System.currentTimeMillis();
                     break;
                 case MotionEvent.ACTION_MOVE:
-                    if(areaSelected >=0&&touched){
+                    if(areaSelectedIndex >=0&& areaSelected){
 
                         int editingBoundary=getEditingBoundary(x,y);
                         editComponent(editingBoundary,x,y);
@@ -121,14 +139,24 @@ public class TemplateViewNew extends View {
                     Log.i(TAG, "onTouchEvent: action move fired");
                     break;
                 case MotionEvent.ACTION_UP:
+                    fingerOnScreen=false;
                     //check long touch or short touch, if long touch, do not change selection state
                     //if short touch, change selection state
                     long endTime=System.currentTimeMillis();
                     touchTime =endTime- startTime;
                     Log.i(TAG, "onTouchEvent: touchTIme="+ touchTime);
                     if(touchTime <TOUCH_TIME_THRESHOLD)
-                        touched = !touched;
-                    areaSelected =whichArea(event.getX(),event.getY());
+                    {
+                        //if it is a short touch toggle area selected boolean
+                        areaSelected = !areaSelected;
+                        //if this is a selection action, calculate area selected index and store
+                        //if this is a deselection action, clear selected index
+                        if(areaSelected)
+                            areaSelectedIndex =whichArea(event.getX(),event.getY());
+                        else
+                            areaSelectedIndex=-1;
+                    }
+
                     break;
             }
 
@@ -137,8 +165,8 @@ public class TemplateViewNew extends View {
 
             invalidate();
 
-            Log.i(TAG, "onTouchEvent: touched="+touched);
             Log.i(TAG, "onTouchEvent: areaSelected="+ areaSelected);
+            Log.i(TAG, "onTouchEvent: areaSelectedIndex="+ areaSelectedIndex);
 
             return true;
         }
@@ -149,12 +177,12 @@ public class TemplateViewNew extends View {
         else
             return super.onTouchEvent(event);
     }
-    public int getAreaSelected(){
-        return areaSelected;
+    public int getAreaSelectedIndex(){
+        return areaSelectedIndex;
     }
 
     private void recordShiftParasInPercentage(float x,float y){
-        TemplateComponent current=components.get(areaSelected);
+        TemplateComponent current=components.get(areaSelectedIndex);
         float percentageX=x/viewWidth;
         float percentageY=y/viewHeight;
         float left=current.getLeft();
@@ -171,7 +199,7 @@ public class TemplateViewNew extends View {
     private void editComponent(int editingBoundary,float x,float y){
         float percentageX=x/viewWidth;
         float percentageY=y/viewHeight;
-        TemplateComponent editingComponent=components.get(areaSelected);
+        TemplateComponent editingComponent=components.get(areaSelectedIndex);
 
 
         switch (editingBoundary){
@@ -200,7 +228,7 @@ public class TemplateViewNew extends View {
 
 
     private int getEditingBoundary(float x,float y){
-        TemplateComponent editingComponent=components.get(areaSelected);
+        TemplateComponent editingComponent=components.get(areaSelectedIndex);
         float left=editingComponent.getLeft()*viewWidth;
         float top=editingComponent.getTop()*viewHeight;
         float right=editingComponent.getRight()*viewWidth;
@@ -211,7 +239,7 @@ public class TemplateViewNew extends View {
 
         int centerCounter=0;
 
-        //check ediding top and bottom
+        //check editing top and bottom
         if(x>left+BOUNDARY_OFFSET&&x<right-BOUNDARY_OFFSET){
             if(y>top-BOUNDARY_OFFSET&&y<top+BOUNDARY_OFFSET)
                 editingBoundary=EDITING_TOP;
@@ -249,10 +277,10 @@ public class TemplateViewNew extends View {
     private int whichArea(float x, float y) {
         for (int i = 0; i < components.size(); i++) {
             TemplateComponent current = components.get(i);
-            float left = current.getResolvedLeft();
-            float top = current.getResolvedTop();
-            float right = current.getResolvedRight();
-            float bottom = current.getResolvedBottom();
+            float left = current.getLeft()*viewWidth;
+            float top = current.getTop()*viewHeight;
+            float right = current.getRight()*viewWidth;
+            float bottom = current.getBottom()*viewHeight;
             if (x > left && x < right && y > top && y < bottom)
                 return i;
         }
@@ -261,7 +289,24 @@ public class TemplateViewNew extends View {
     }
 
 
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        int widthMode = MeasureSpec.getMode(widthMeasureSpec);
+        int widthSize = MeasureSpec.getSize(widthMeasureSpec);
+        int heightMode = MeasureSpec.getMode(heightMeasureSpec);
+        int heightSize = MeasureSpec.getSize(heightMeasureSpec);
 
+        int width=widthSize;
+        int height=heightSize;
+        if(heightMode==MeasureSpec.UNSPECIFIED){
+            height=width/16*9;
+        }
+
+
+        setMeasuredDimension(width,height);
+
+    }
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
@@ -276,16 +321,33 @@ public class TemplateViewNew extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         Log.i(TAG, "onDraw: fired");
-        Log.i(TAG, "onDraw: areaSelected="+ areaSelected);
+        Log.i(TAG, "onDraw: areaSelectedIndex="+ areaSelectedIndex);
 
 
+        //draw component rects
         for(int i=0;i<components.size();i++){
             TemplateComponent component=components.get(i);
             Paint currentPaint=boundaryPaint;
-            if(touched&&(i== areaSelected))
+            if(areaSelected &&(i== areaSelectedIndex))
                 currentPaint=boundaryPaintSelected;
 
             canvas.drawRect(component.getLeft()*viewWidth,component.getTop()*viewHeight,component.getRight()*viewWidth,component.getBottom()*viewHeight,currentPaint);
+        }
+
+        //draw size value box and value
+        if(fingerOnScreen&&areaSelectedIndex>-1){
+            TemplateComponent selectedComponent=components.get(areaSelectedIndex);
+
+            float x=selectedComponent.getLeft()*viewWidth;
+            float y=selectedComponent.getTop()*viewHeight;
+            float width=(selectedComponent.getRight()-selectedComponent.getLeft())*viewWidth;
+            float height=(selectedComponent.getBottom()-selectedComponent.getTop())*viewHeight;
+            String valueText="X = "+x+lineSeparator+"Y = "+y+lineSeparator+"Width = "+width+lineSeparator+" Height = "+height;
+            canvas.drawRect(50,50,550,350, sizeValueOverlapBoxPaint);
+            canvas.drawText("X = "+x,70,100, sizeValueTextPaint);
+            canvas.drawText("Y = "+y,70,100+SIZE_VALUE_TEXT+SIZE_VALUE_TEXT_SPACE,sizeValueTextPaint);
+            canvas.drawText("Width = "+width,70,100+2*SIZE_VALUE_TEXT+2*SIZE_VALUE_TEXT_SPACE,sizeValueTextPaint);
+            canvas.drawText("Height = "+height,70,100+3*SIZE_VALUE_TEXT+3*SIZE_VALUE_TEXT_SPACE,sizeValueTextPaint);
         }
     }
 
@@ -295,6 +357,14 @@ public class TemplateViewNew extends View {
 
     public void setEditMode(boolean editMode) {
         this.editMode = editMode;
+    }
+
+    public int getViewWidth() {
+        return viewWidth;
+    }
+
+    public int getViewHeight() {
+        return viewHeight;
     }
 
     public void setComponentDetail(int position, int type, Uri srcUri, String srcStr){
@@ -307,6 +377,10 @@ public class TemplateViewNew extends View {
         requestLayout();
     }
 
+    public void setComponent(int id,TemplateComponent component){
+        components.set(id,component);
+    }
+
     /**
      *
      * @param id
@@ -317,6 +391,37 @@ public class TemplateViewNew extends View {
         current.setParentWidth(viewWidth);
         current.setParentHeight(viewHeight);
         return current;
+    }
+    public boolean setSelectedComponentSize(float x,float y,float width,float height){
+        if(areaSelectedIndex<0)
+            return false;
+        else{
+            TemplateComponent selected=components.get(areaSelectedIndex);
+            selected.setLeft(x/viewWidth);
+            selected.setTop(y/viewHeight);
+            selected.setRight(x/viewWidth+width/viewWidth);
+            selected.setBottom(y/viewHeight+height/viewHeight);
+            invalidate();
+            return true;
+
+        }
+    }
+
+    public void addNewComponent(){
+        TemplateComponent newComponent=new TemplateComponent(context,0.25f,0.25f,0.75f,0.75f);
+        components.add(newComponent);
+        invalidate();
+    }
+    public boolean removeSelectedComponent(){
+        if(areaSelectedIndex<0)
+            return false;
+        else{
+            components.remove(areaSelectedIndex);
+            areaSelectedIndex=-1;
+            invalidate();
+            return true;
+        }
+
     }
 
     public ArrayList<TemplateComponent> getComponentList(){
