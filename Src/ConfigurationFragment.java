@@ -28,7 +28,7 @@ import java.util.regex.Pattern;
 public class ConfigurationFragment extends Fragment {
     ViewPager viewPager;
     Button Continue, Exit, Check, Delete, Sets, Setw;
-    EditText pass/*, time, wtime*/;
+    EditText pass;
     TextView status, asustatus, tvtime, tvwtime /*,click*/;
 
     private RadioGroup radioGroup, radioGroup2;
@@ -66,11 +66,7 @@ public class ConfigurationFragment extends Fragment {
         tvtime = (TextView) rootView.findViewById(R.id.tvTime);
         tvwtime = (TextView) rootView.findViewById(R.id.tvW);
 
-        //click = (TextView) rootView.findViewById(R.id.tvClick);
-
         pass = (EditText) rootView.findViewById(R.id.etPassword);
-        //time = (EditText) rootView.findViewById(R.id.extTime);
-        //wtime = (EditText) rootView.findViewById(R.id.extwT);
         viewPager = (ViewPager) getActivity().findViewById(R.id.pager);
 
 
@@ -124,43 +120,6 @@ public class ConfigurationFragment extends Fragment {
             }
         });
 
-       /* time.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-
-                openTimePickerDialog(true);
-
-
-            }
-        });*/
-
-        /*wtime.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                openTimePickerDialog2(true);
-
-
-            }
-        });*/
-
-
-
-
-		/*Exit.setOnClickListener(new View.OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-
-
-
-
-
-			}
-		});*/
-
-
         Check.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -211,31 +170,7 @@ public class ConfigurationFragment extends Fragment {
 
         });
 
-         /*
-         click.setPaintFlags(click.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
-        click.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-
-                AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
-                alertDialog.setTitle("Instruction");
-                alertDialog.setMessage("Step 1: Click Mfusion" + "\n"+ "\n" + "Step 2: Configure"+ "\n"+ "\n" + "Step 3: Choose templates"
-                        + "\n"+ "\n" + "Step 4: Adjust Templates"+ "\n"+ "\n" + "Step 5: Create PBU" + " " + "Step 6: Schedule"
-                        + "\n"+ "\n" + "Step 7: RUN and Display"+ "\n"+ "\n" + "Step 8: Finish");
-                alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        });
-                alertDialog.show();
-
-
-            }
-        });//instruction*/
-
-        add();
+        add();//method for adding a default password to database
         retd();//method for retreving value from database and set the result at the textview or radiobutton
         return rootView;
 
@@ -248,12 +183,12 @@ public class ConfigurationFragment extends Fragment {
         controller.list_setting6(tvtime, tvwtime, status, pass, radioGroup, radioGroup2);//Called DBController method listsettings6 to invoke database
 
 
-    }//end og retd method
+    }//end of retd method
 
     private void add()
     {
        controller.insert_setting3();
-    }
+    }//end of method add
 
 
 
