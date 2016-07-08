@@ -13,9 +13,6 @@ import com.example.mfusion.model.TemplateComponent;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by JCYYYY on 2016/5/31.
- */
 public class TemplateDAO {
     private static final String TAG = "TemplateDAO";
 
@@ -28,7 +25,7 @@ public class TemplateDAO {
         this.context=context;
         sdPath= Environment.getExternalStorageDirectory().getAbsolutePath().toString();
         db=SQLiteDatabase.openOrCreateDatabase(sdPath+ DbIniter.APP_FOLDER+ DbIniter.DB_NAME,null);
-    }
+    }  // storage path
 
     public MyTemplate getMyTemplateById(int id) {
         String selectComponent = "select left,top,right,bottom,tid,id from " + DbIniter.TABLE_NAME_COMPONENT + " where tid=" + id;
@@ -44,8 +41,11 @@ public class TemplateDAO {
             currentComponent.setTid(result.getInt(4));
             currentComponent.setId(result.getInt(5));
             componentList.add(currentComponent);
-        }
-        String selectTemplateNameSql="select name from "+DbIniter.TABLE_NAME_TEMPLATE+" where id="+id;
+        }  //getTemplateById()，int id
+       
+        
+        
+        String selectTemplateNameSql="select name from "+DbIniter.TABLE_NAME_TEMPLATE+" where id="+id;//select statement
         Cursor nameResult=db.rawQuery(selectTemplateNameSql,null);
         nameResult.moveToLast();
         String templateName=nameResult.getString(0);
@@ -64,7 +64,7 @@ public class TemplateDAO {
             list.add(getMyTemplateById(i));
         }
         return list;
-    }
+    }//list all template method
 
     public void updateMyTemplete(MyTemplate updatedTemplate) {
         ArrayList<TemplateComponent> components = updatedTemplate.getList();
@@ -78,7 +78,7 @@ public class TemplateDAO {
             db.execSQL(updateComponent);
             db.setTransactionSuccessful();
             db.endTransaction();
-        }
+        }//update all template, UpdateTemplate()
 
 
 
@@ -96,16 +96,17 @@ public class TemplateDAO {
         int lastestId=getLargestTemplateId();
         List<TemplateComponent> components=newTemplate.getList();
         for(TemplateComponent current:components){
-            String insertComponentSql="insert into "+DbIniter.TABLE_NAME_COMPONENT+" (id,left,top,right,bottom,tid) values(null,"+current.getLeft()+","+current.getTop()+","+current.getRight()+","+current.getBottom()+","+lastestId+")";
+            String insertComponentSql="insert into "+DbIniter.TABLE_NAME_COMPONENT+" (id,left,top,right,bottom,tid) values(null,"+current.getLeft()+","+current.getTop()+","+current.getRight()+","+current.getBottom()+","+lastestId+")";//insert statement
             Log.i(TAG, "saveTemplate: insert component sql="+insertComponentSql);
             db.beginTransaction();
             db.execSQL(insertComponentSql);
             db.setTransactionSuccessful();
             db.endTransaction();
-        }
+        }// for loop
 
 
-    }
+    }// AddTemplate()
+    
     private int getLargestTemplateId(){
         String sql="select id from "+DbIniter.TABLE_NAME_TEMPLATE+" order by id desc limit 1";
         Cursor result=db.rawQuery(sql,null);
