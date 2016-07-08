@@ -75,7 +75,7 @@ public class LogFragment extends Fragment {
 
 
             }
-        });
+        });//load data from logcat
 
         clear.setOnClickListener(new View.OnClickListener() {
 
@@ -101,7 +101,7 @@ public class LogFragment extends Fragment {
                 }
 
             }
-        });
+        });//clear data 
 
 
 
