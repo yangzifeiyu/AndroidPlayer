@@ -37,7 +37,7 @@ public class TabsPagerAdapter extends FragmentPagerAdapter {
                 return new AboutFragment();
 
             case 4:
-                // About fragment activity
+                // Log fragment activity
                 return new LogFragment();
         }
 
