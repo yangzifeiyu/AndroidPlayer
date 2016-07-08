@@ -80,7 +80,7 @@ public class MainActivity extends FragmentActivity implements
 			@Override
 			public void onPageScrollStateChanged(int arg0) {
 			}
-		});
+		});// setOnPageChangeListener
 
 
 
@@ -154,7 +154,7 @@ public class MainActivity extends FragmentActivity implements
 
 
 				}
-			});
+			});   //set password
 			builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
