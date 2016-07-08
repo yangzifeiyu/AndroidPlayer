@@ -12,7 +12,7 @@ public class DbIniter {
 
     private SQLiteDatabase db;
     public static final String APP_FOLDER="/MFusion/";
-    public static final String DB_NAME="data.db";
+    public static final String DB_NAME="MfusionDataBase.db";
     public static final String TABLE_NAME_TEMPLATE="tamplate";
     public static final String TABLE_NAME_COMPONENT="component";
 
