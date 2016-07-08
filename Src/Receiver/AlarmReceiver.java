@@ -18,7 +18,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 				| PowerManager.ON_AFTER_RELEASE, "Your App Tag");
 		wakelock.acquire();
 		wakelock.release();
-	}
+	}//receive shutdown (method)
 
 
 
