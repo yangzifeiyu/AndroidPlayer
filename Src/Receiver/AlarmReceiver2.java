@@ -20,4 +20,4 @@ public class AlarmReceiver2 extends BroadcastReceiver {
 
 	}
 
-}
+}// receive setted wake up time(method)
