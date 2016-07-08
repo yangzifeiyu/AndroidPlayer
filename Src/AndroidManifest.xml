@@ -52,9 +52,11 @@
         <activity
             android:name=".ShowTemplateActivity"
             android:screenOrientation="landscape" />
-        <activity android:name=".ShowScreenActivity" />
-        >
-        <activity android:name=".EditTextPropertyActivity"></activity>
+        <activity android:name=".ShowScreenActivity"
+            android:screenOrientation="landscape"/>
+        <activity android:name=".EditTextPropertyActivity" />
+        <activity android:name=".Template.AddNewTemplateActivity"
+            android:screenOrientation="landscape"></activity></activity>
     </application>
 
 </manifest>
