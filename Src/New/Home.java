@@ -56,7 +56,9 @@ public class Home extends Activity {
 
 
             }
-        });
+        });//instrution message (onClick method)
+        
+        
         if (getIntent().getBooleanExtra("EXIT", false)) {
             finish();
         }
