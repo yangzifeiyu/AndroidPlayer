@@ -1,14 +1,19 @@
 package com.example.mfusion;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.renderscript.Type;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.RadioButton;
@@ -17,8 +22,11 @@ import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.example.mfusion.model.TemplateComponent;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class EditTextPropertyActivity extends Activity {
     private static final String TAG = "EditTextPropertyActivit";
@@ -31,9 +39,13 @@ public class EditTextPropertyActivity extends Activity {
     @BindView(R.id.edit_text_prop_sw_bold)Switch swBold;
     @BindView(R.id.edit_text_prop_sw_italic)Switch swItalic;
     @BindView(R.id.edit_text_prop_et_color)EditText etColor;
+    @BindView(R.id.edit_text_prop_btn_confirm)Button btnConfirm;
 
-
+    private String text;
     private String fontType;
+    public static final int STYLE_BOLD=1;
+    public static final int STYLE_ITALIC=2;
+    public static final int STYLE_BOLD_ITALIC=STYLE_BOLD+STYLE_ITALIC;
     private float fontSize;
     private boolean bold;
     private boolean italic;
@@ -42,6 +54,8 @@ public class EditTextPropertyActivity extends Activity {
     private Typeface pypats;
     private Typeface vtks;
 
+    private TemplateComponent editingComponent;
+    private int fontStyle;
 
 
     @Override
@@ -52,7 +66,20 @@ public class EditTextPropertyActivity extends Activity {
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_edit_text_property);
         ButterKnife.bind(this);
+        //get editing component from intent
+        editingComponent=(TemplateComponent) getIntent().getExtras().get("component");
+        //init text view
+        if(editingComponent.getSourceText()!=null)
+        {
+            text=editingComponent.getSourceText();
+            tvDemo.setText(text);
+        }
+        else{
+            text="Your Text Here";
+            tvDemo.setText(text);
+        }
 
+        initVariables();
         setUpRadioButton();
         setUpRbg();
         setUpSeekBar();
@@ -61,7 +88,11 @@ public class EditTextPropertyActivity extends Activity {
 
     }
     private void initVariables(){
+        fontSize=20;
 
+        fontType=null;
+        fontStyle=Typeface.NORMAL;
+        color=Color.BLACK;
     }
 
     private void setUpColorEt(){
@@ -105,15 +136,15 @@ public class EditTextPropertyActivity extends Activity {
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 switch (checkedId){
                     case R.id.edit_text_prop_rb_pypats:
-                        fontType="Pypats";
+                        fontType="Pypats.ttf";
                         tvDemo.setTypeface(pypats);
                         break;
                     case R.id.edit_text_prop_rb_vtks:
-                        fontType="Vtks Blank";
+                        fontType="Vtks Blank.ttf";
                         tvDemo.setTypeface(vtks);
                         break;
                     case R.id.edit_text_prop_rb_default:
-                        fontType="Default";
+                        fontType=null;
                         tvDemo.setTypeface(null);
                         break;
                 }
@@ -121,6 +152,7 @@ public class EditTextPropertyActivity extends Activity {
         });
     }
     private void setUpSeekBar(){
+        sizeSeekBar.setProgress(20);
         sizeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -159,18 +191,60 @@ public class EditTextPropertyActivity extends Activity {
     }
 
     private void setDemoStyle(){
-
-        if(bold&&italic)
-            tvDemo.setTypeface(tvDemo.getTypeface(),Typeface.BOLD_ITALIC);
-        else{
-            if(bold)
-                tvDemo.setTypeface(tvDemo.getTypeface(),Typeface.BOLD);
-            if(italic)
-                tvDemo.setTypeface(tvDemo.getTypeface(),Typeface.ITALIC);
-        }
-        if(!(bold||italic))
+        if(!(bold||italic)) {
             tvDemo.setTypeface(Typeface.create(tvDemo.getTypeface(), Typeface.NORMAL), Typeface.NORMAL);
+            fontStyle = Typeface.NORMAL;
+        }
+        else{
+            if(bold&&italic){
+                fontStyle= Typeface.BOLD_ITALIC;
+
+            }
+
+            else{
+                if(bold)
+                    fontStyle=Typeface.BOLD;
+                if(italic)
+                    fontStyle=Typeface.ITALIC;
+            }
+            tvDemo.setTypeface(tvDemo.getTypeface(),fontStyle);
+
+        }
 
 
+
+
+
+
+    }
+    @OnClick(R.id.edit_text_prop_tv_demo)
+    void editText(){
+        AlertDialog.Builder builder=new AlertDialog.Builder(this);
+        builder.setTitle("Enter your text");
+        final EditText editText=new EditText(this);
+        builder.setView(editText);
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                text=editText.getText().toString();
+                tvDemo.setText(text);
+            }
+        });
+        builder.show();
+    }
+
+    @OnClick(R.id.edit_text_prop_btn_confirm)
+    void confirm(){
+
+
+        editingComponent.setSourceText(text);
+        editingComponent.setFontColor(color);
+        editingComponent.setFontStyle(fontStyle);
+        editingComponent.setFontSize(fontSize);
+        editingComponent.setFontType(fontType);
+        Intent returnIntent=new Intent();
+        returnIntent.putExtra("edited",editingComponent);
+        setResult(Activity.RESULT_OK,returnIntent);
+        finish();
     }
 }
