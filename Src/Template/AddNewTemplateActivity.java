@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import com.example.mfusion.R;
 import com.example.mfusion.model.MyTemplate;
+import com.example.mfusion.model.TemplateComponent;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -55,20 +56,20 @@ public class AddNewTemplateActivity extends Activity {
     @OnClick(R.id.add_template_img_add)
     void addComponent(){
         templateView.addNewComponent();
-    }//add Component()
-    
+    }
     @OnClick(R.id.add_template_img_minus)
     void removeSelectedComponent(){
         if(!templateView.removeSelectedComponent()){
             Toast.makeText(AddNewTemplateActivity.this, "Please select a component to remove", Toast.LENGTH_SHORT).show();
         }
-    }//remove componet
-    
+    }
     @OnClick(R.id.add_template_img_adjust)
     void showAdjustDialog(){
         if(templateView.getAreaSelectedIndex()>-1){
-
-            String info="Canvas width : "+templateView.getViewWidth()+lineSeparator+"Canvas height : "+templateView.getViewHeight();
+            TemplateComponent selected=templateView.getComponentById(templateView.getAreaSelectedIndex());
+            int canvasWidth=templateView.getViewWidth();
+            int canvasHeight=templateView.getViewHeight();
+            String info="Canvas width : "+canvasWidth+lineSeparator+"Canvas height : "+canvasHeight;
             AlertDialog.Builder setSizeDialog=new AlertDialog.Builder(this);
             setSizeDialog.setTitle("Set Component Size");
             LayoutInflater inflater=(LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
@@ -78,7 +79,12 @@ public class AddNewTemplateActivity extends Activity {
             final EditText etY=(EditText)dialogView.findViewById(R.id.edit_component_size_dialog_et_y);
             final EditText etWidth=(EditText)dialogView.findViewById(R.id.edit_component_size_dialog_et_width);
             final EditText etHeight=(EditText)dialogView.findViewById(R.id.edit_component_size_dialog_et_height);
+
             tvInfo.setText(info);
+            etX.setText(String.valueOf(selected.getLeft()*canvasWidth));
+            etY.setText(String.valueOf(selected.getTop()*canvasHeight));
+            etWidth.setText(String.valueOf((selected.getRight()-selected.getLeft())*canvasWidth));
+            etHeight.setText(String.valueOf((selected.getBottom()-selected.getTop())*canvasHeight));
             setSizeDialog.setView(dialogView);
             setSizeDialog.setPositiveButton("Save", new DialogInterface.OnClickListener() {
                 @Override
@@ -113,6 +119,6 @@ public class AddNewTemplateActivity extends Activity {
             }
         });
         saveDialog.show();
-    }//save Template()
+    }
 
 }
