@@ -64,9 +64,6 @@ public class DBController extends SQLiteOpenHelper {
         contentValues.put("Wakeup", Wakeup);
         contentValues.put("Autostart", Autostart);
 
-
-        this.getWritableDatabase().insertOrThrow("System_Settings", "", contentValues);//insert value into the table
-
         Cursor c = this.getReadableDatabase().rawQuery("SELECT * FROM System_Settings", null);
         if (c.getCount() < 1) {
             this.getWritableDatabase().insertOrThrow("System_Settings", "", contentValues);//insert value into the table
@@ -75,6 +72,23 @@ public class DBController extends SQLiteOpenHelper {
                 this.getWritableDatabase().execSQL("UPDATE System_Settings SET Display='" + Display + "',Password='" + Password + "',Shutdown='" + Shutdown + "',Wakeup='" + Wakeup + "', Autostart='" + Autostart + "'");
             }
         }
+        c.close();
+
+    }
+
+    public void insert_setting3() {
+        ContentValues contentValues2 = new ContentValues();
+        contentValues2.put("Display", "Landscape");
+        contentValues2.put("Password", "mfusion");
+        contentValues2.put("Shutdown", "");
+        contentValues2.put("Wakeup", "");
+        contentValues2.put("Autostart", "No");
+
+        Cursor c = this.getReadableDatabase().rawQuery("SELECT * FROM System_Settings", null);
+        if (c.getCount() < 1) {
+            this.getWritableDatabase().insertOrThrow("System_Settings", "", contentValues2);//insert value into the table
+        }
+
         c.close();
 
     }
