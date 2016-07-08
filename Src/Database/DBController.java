@@ -21,10 +21,7 @@ import java.util.ArrayList;
 public class DBController extends SQLiteOpenHelper {
     private static final String DataBase_Name = "/mnt/sdcard/MFusion/MfusionDataBase.db";
     private static final int DATABASE_VERSION = 1;
-    public static final String TABLE_NAME = "Schedule";
-    public static final String TABLE_NAME1 = "ScheduleBlock";
-    public static final String TABLE_NAME2 = "TemplateCompo";
-    public static final String TABLE_NAME3 = "Block_Item";
+
     public static final String TABLE_NAME4 = "System_Settings";
     public static final String TABLE_NAME5 = "Template";
     public static final String TABLE_NAME6 = "Playlist";
@@ -246,7 +243,6 @@ public class DBController extends SQLiteOpenHelper {
 //        Log.e("DATABASE OPERATIONS", "One row is inserted...");
 
 
-    }//schedule block item
 
 //    public Cursor getPlaylist(SQLiteDatabase db6){
 //
