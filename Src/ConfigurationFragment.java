@@ -58,8 +58,9 @@ public class ConfigurationFragment extends Fragment {
 
         Continue = (Button) rootView.findViewById(R.id.btnContinue);
         Check = (Button) rootView.findViewById(R.id.btnCheck);
-        Sets = (Button) rootView.findViewById(R.id.btnShutdown);
-        Setw = (Button) rootView.findViewById(R.id.btnWakeup);
+         Setw = (Button) rootView.findViewById(R.id.btnWakeup);
+         Sets = (Button) rootView.findViewById(R.id.btnShutdown);
+       
         //Exit = (Button) rootView.findViewById(R.id.btnExit);
         Delete = (Button) rootView.findViewById(R.id.btnDelete);
         status = (TextView) rootView.findViewById(R.id.txtStatusPa);
@@ -82,7 +83,7 @@ public class ConfigurationFragment extends Fragment {
             public void onClick(View v) {
                 continues();
             }
-        });
+        });//onclick method-Continue(save)button
 
 
 //        Delete.setOnClickListener(new View.OnClickListener() {
@@ -95,7 +96,19 @@ public class ConfigurationFragment extends Fragment {
 //            }
 //        });
 
+        setw.setOnClickListener(new View.OnClickListener() {
 
+            @Override
+            public void onClick(View v) {
+
+
+                openTimePickerDialog2(true);
+
+
+            }
+        });//set wake up time
+        
+        
         Sets.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -106,19 +119,9 @@ public class ConfigurationFragment extends Fragment {
 
 
             }
-        });
+        });//set shutdown time
 
-        Setw.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-
-
-                openTimePickerDialog2(true);
-
-
-            }
-        });
+        
 
         Check.setOnClickListener(new View.OnClickListener() {
 
@@ -127,7 +130,7 @@ public class ConfigurationFragment extends Fragment {
 
                 check();
             }
-        });
+        });//check password
 
 
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
@@ -149,7 +152,7 @@ public class ConfigurationFragment extends Fragment {
 
             }
 
-        });
+        });// set screen orientation
 
         radioGroup2.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
 
@@ -168,7 +171,7 @@ public class ConfigurationFragment extends Fragment {
 
             }
 
-        });
+        });// set auto Start up
 
         add();//method for adding a default password to database
         retd();//method for retreving value from database and set the result at the textview or radiobutton
@@ -208,7 +211,21 @@ public class ConfigurationFragment extends Fragment {
 
     }//valid password
 
+   private void openTimePickerDialog2(boolean is24r) {
 
+        Calendar calendar = Calendar.getInstance();
+
+        timePickerDialog = new TimePickerDialog(getActivity(), onTimeSetListener2,
+                calendar.get(Calendar.HOUR_OF_DAY),
+                calendar.get(Calendar.MINUTE),
+                is24r);
+        timePickerDialog.setTitle("Set Wakeup Time");
+
+        timePickerDialog.show();
+
+    }// set timepicker (wake up time)
+    
+    
     private void openTimePickerDialog(boolean is24r) {
 
         Calendar calendar = Calendar.getInstance();
@@ -221,22 +238,9 @@ public class ConfigurationFragment extends Fragment {
 
         timePickerDialog.show();
 
+    }// set timepicker (shutdown time)
 
-    }
-
-    private void openTimePickerDialog2(boolean is24r) {
-
-        Calendar calendar = Calendar.getInstance();
-
-        timePickerDialog = new TimePickerDialog(getActivity(), onTimeSetListener2,
-                calendar.get(Calendar.HOUR_OF_DAY),
-                calendar.get(Calendar.MINUTE),
-                is24r);
-        timePickerDialog.setTitle("Set Wakeup Time");
-
-        timePickerDialog.show();
-
-    }
+ 
 
     OnTimeSetListener onTimeSetListener
             = new OnTimeSetListener() {
@@ -343,7 +347,7 @@ public class ConfigurationFragment extends Fragment {
         String auto = ((RadioButton) getActivity().findViewById(radioGroup2.getCheckedRadioButtonId())).getText().toString().trim();
 
         if (pa.isEmpty() && dis != null && auto != null) {
-            //controller.insert_setting(dis, pa, shut, wake, auto);
+         
             controller.insert_setting2(dis, pa, shut, wake, auto);
             Toast.makeText(getActivity(), "INSERTED WITH Default PASSWORD", Toast.LENGTH_SHORT).show();
             viewPager.setCurrentItem(1);
@@ -361,7 +365,7 @@ public class ConfigurationFragment extends Fragment {
             }
         }
 
-    }//continue
+    }//insert setting (continue button)
 
 
 }//clase
