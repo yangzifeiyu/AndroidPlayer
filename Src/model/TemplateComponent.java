@@ -1,6 +1,7 @@
 package com.example.mfusion.model;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -30,6 +31,7 @@ public class TemplateComponent implements Parcelable{
     public static final int TYPE_VIDEO=2;
     public static final int TYPE_IMAGE=3;
     public static final int TYPE_STATIC_TEXT=4;
+    public static final int TYPE_DATE=5;
 
 
     private int type;
@@ -38,7 +40,7 @@ public class TemplateComponent implements Parcelable{
 
     private String fontType;
     private float fontSize;
-    private String fontColor;
+    private int fontColor;
     private int fontStyle;
 
     private Context context;
@@ -171,11 +173,11 @@ public class TemplateComponent implements Parcelable{
         this.fontSize = fontSize;
     }
 
-    public String getFontColor() {
+    public int getFontColor() {
         return fontColor;
     }
 
-    public void setFontColor(String fontColor) {
+    public void setFontColor(int fontColor) {
         this.fontColor = fontColor;
     }
 
@@ -193,7 +195,11 @@ public class TemplateComponent implements Parcelable{
         this.top = top;
         this.right = right;
         this.bottom = bottom;
-        this.sourceText="";
+        this.sourceText="Edit Text";
+        fontColor= Color.BLACK;
+        fontStyle=0;
+        fontSize=20f;
+        fontType=null;
 
         this.context=context;
         su=new ScreenUtil(context);
@@ -217,7 +223,7 @@ public class TemplateComponent implements Parcelable{
         sourceText = in.readString();
         fontType=in.readString();
         fontSize=in.readFloat();
-        fontColor=in.readString();
+        fontColor=in.readInt();
         fontStyle=in.readInt();
 
         parentWidth = in.readInt();
@@ -243,7 +249,7 @@ public class TemplateComponent implements Parcelable{
         dest.writeString(sourceText);
         dest.writeString(fontType);
         dest.writeFloat(fontSize);
-        dest.writeString(fontColor);
+        dest.writeInt(fontColor);
         dest.writeInt(fontStyle);
 
         dest.writeInt(parentWidth);
