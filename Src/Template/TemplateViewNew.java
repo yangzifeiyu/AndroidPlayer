@@ -357,6 +357,10 @@ public class TemplateViewNew extends View {
 
     public void setEditMode(boolean editMode) {
         this.editMode = editMode;
+        //if user exit edit mode, selected component will be cleared
+        if(!editMode)
+        areaSelectedIndex=-1;
+        invalidate();
     }
 
     public int getViewWidth() {
