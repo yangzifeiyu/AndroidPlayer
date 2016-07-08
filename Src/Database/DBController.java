@@ -15,9 +15,6 @@ import com.example.mfusion.R;
 
 import java.util.ArrayList;
 
-/**
- * Created by WANG on 6/8/2016.
- */
 public class DBController extends SQLiteOpenHelper {
     private static final String DataBase_Name = "/mnt/sdcard/MFusion/MfusionDataBase.db";
     private static final int DATABASE_VERSION = 1;
