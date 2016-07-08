@@ -55,13 +55,15 @@ public class AddNewTemplateActivity extends Activity {
     @OnClick(R.id.add_template_img_add)
     void addComponent(){
         templateView.addNewComponent();
-    }
+    }//add Component()
+    
     @OnClick(R.id.add_template_img_minus)
     void removeSelectedComponent(){
         if(!templateView.removeSelectedComponent()){
             Toast.makeText(AddNewTemplateActivity.this, "Please select a component to remove", Toast.LENGTH_SHORT).show();
         }
-    }
+    }//remove componet
+    
     @OnClick(R.id.add_template_img_adjust)
     void showAdjustDialog(){
         if(templateView.getAreaSelectedIndex()>-1){
@@ -111,6 +113,6 @@ public class AddNewTemplateActivity extends Activity {
             }
         });
         saveDialog.show();
-    }
+    }//save Template()
 
 }
