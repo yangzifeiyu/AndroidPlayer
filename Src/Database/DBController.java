@@ -29,8 +29,7 @@ public class DBController extends SQLiteOpenHelper {
     public static final String TABLE_NAME5 = "Template";
     public static final String TABLE_NAME6 = "Playlist";
 
-    //String sql ="INSERT INTO System_Settings (Display,Password,Shutdown,Wakeup,Autostart)VALUES('Landscape','mfusion',' ',' ','No')" ;
-
+   
     public DBController(Context context, String s, Object o, int i) {
         super(context, DataBase_Name, null, DATABASE_VERSION);//specify the name,version,object
         Log.e("DATABASE OPERATIONS", "Database opened...");
@@ -43,7 +42,7 @@ public class DBController extends SQLiteOpenHelper {
         db1.execSQL("CREATE TABLE System_Settings(ID INTEGER PRIMARY KEY AUTOINCREMENT,Display TEXT,Password TEXT,Shutdown INTEGER,Wakeup INTEGER, Autostart TEXT);");
 
         Log.e("DATABASE OPERATIONS", "Table created...");
-    }
+    }//OnCreate method-create configuration table
 
     @Override
     public void onUpgrade(SQLiteDatabase db1, int oldVersion, int newVersion) {
@@ -74,7 +73,7 @@ public class DBController extends SQLiteOpenHelper {
         }
         c.close();
 
-    }
+    }//insert setting
 
     public void insert_setting3() {
         ContentValues contentValues2 = new ContentValues();
@@ -91,7 +90,7 @@ public class DBController extends SQLiteOpenHelper {
 
         c.close();
 
-    }
+    }//insert value into the configuration table
 
     public void insert_setting2(String Display, String Password, String Shutdown, String Wakeup, String Autostart) {
         ContentValues contentValues = new ContentValues();
@@ -214,7 +213,9 @@ public class DBController extends SQLiteOpenHelper {
             return "NO User Exit Password";
         }
 
-        return password2;
+         return "No User Password";
+        }//diplay if users never set the password
+   return password2;
     }
 
 
@@ -235,7 +236,7 @@ public class DBController extends SQLiteOpenHelper {
         } finally {
             db.endTransaction();
             db.close();
-        }
+        }//insert playlist method
 
 //        ContentValues contentValues = new ContentValues();
 //        contentValues.put(PlaylistClass.NewPlaylist.listId, Id);
