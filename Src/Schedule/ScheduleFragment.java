@@ -1,27 +1,37 @@
 package com.example.mfusion.Schedule;
 
+import android.content.ClipData;
+import android.graphics.Canvas;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.view.DragEvent;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ListView;
+import android.widget.Toast;
 
 import com.example.mfusion.R;
+import com.example.mfusion.Template.TemplateDAO;
+import com.example.mfusion.adapter.TemplateListViewAdapter;
+import com.example.mfusion.model.MyTemplate;
+
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.List;
+
+import butterknife.ButterKnife;
 
 public class ScheduleFragment extends Fragment {
 
-//	private ScheduleView scheduleView;
-//	private ArrayList<MySchedule> schedule;
-//	private static int currentPosition;
-	Calendar calendar = Calendar.getInstance();
-	TextView show;
-	ImageButton play,save,saveas,delete;
-	Spinner listsp;
-	Spinner modesp;
-	ArrayAdapter<CharSequence> adapter1,adapter2;
-	private int mYear, mMonth, mDay;
-//	DatabaseHelper myDb;
-
+	private ScheduleBlockView blockView;
+	private View mDrapView;
+	private GestureDetector mGestureDetector;
+	ListView tList;
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 							 Bundle savedInstanceState) {
@@ -29,124 +39,53 @@ public class ScheduleFragment extends Fragment {
 
 		View rootView = inflater.inflate(R.layout.fragment_schedule, container, false);
 
-//		scheduleView=(ScheduleView) rootView.findViewById(R.id.scheduleView);
-//		schedule=new ArrayList<>();
+		blockView = (ScheduleBlockView) rootView.findViewById(R.id.block);
+		tList = (ListView) rootView.findViewById(R.id.listview);
+
+		mGestureDetector = new GestureDetector(getActivity(), new DrapGestureListener());
+
+//		setContentView(R.layout.fragment_schedule);
+
+		ButterKnife.bind(getActivity());
+
+		TemplateDAO templateDAO = new TemplateDAO(getActivity());
+		List<MyTemplate> templates = new ArrayList<>();
+		for (int i = 0; i < 6; i++) {
+			templates.add(templateDAO.getMyTemplateById(i));
 
 
-		show = (TextView) rootView.findViewById(R.id.tvshow);
-
-		Button weekbtn=(Button) rootView.findViewById(R.id.week_btn);
-		weekbtn.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
+			TemplateListViewAdapter adapter = new TemplateListViewAdapter(getActivity(), templates);
+			tList.setAdapter(adapter);
+		}
 
 
-				mYear = calendar.get(Calendar.YEAR);
-				mMonth = calendar.get(Calendar.MONTH);
-				mDay = calendar.get(Calendar.DAY_OF_MONTH);
+		tList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			public void onItemClick(AdapterView<?> myAdapter, View myView, int myItemInt, long mylng) {
+				tList.getItemAtPosition(myItemInt);
+				if (myItemInt == 0) {
 
-				// Launch Date Picker Dialog
-				DatePickerDialog dpd = new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
+					Toast.makeText(getActivity(), "Selected 1", Toast.LENGTH_LONG).show();
 
-					@Override
-					public void onDateSet(DatePicker view, int year,
-										  int monthOfYear, int dayOfMonth) {
-						// Display Selected date in textbox
-						show.setText("Select date is: " + dayOfMonth+ "/" + monthOfYear + "/" + year);
+				}
 
-					}
-				}, mYear, mMonth, mDay);
-				dpd.show();
+				else  if (myItemInt == 1) {
+					Toast.makeText(getActivity(), "Selected 2", Toast.LENGTH_LONG).show();
+				}
 
-			}
-		});
-
-		modesp=(Spinner) rootView.findViewById(R.id.sp_mode);
-		adapter1=ArrayAdapter.createFromResource(getActivity(),R.array.mode_names,android.R.layout.simple_spinner_item);
-		adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		modesp.setAdapter(adapter1);
-		modesp.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-
-			@Override
-			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-				Toast.makeText(getActivity(),parent.getItemAtPosition(position)+" is selected",Toast.LENGTH_LONG).show();
-
-			}
-
-			@Override
-			public void onNothingSelected(AdapterView<?> parent) {
-
-			}
-		} );
-
-		listsp=(Spinner) rootView.findViewById(R.id.sp_list);
-		adapter2=ArrayAdapter.createFromResource(getActivity(),R.array.list_names,android.R.layout.simple_spinner_item);
-		adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		listsp.setAdapter(adapter2);
-		listsp.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-
-			@Override
-			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-//				ArrayList<String> playlist=new ArrayList<>();
-//				displaysp = (Spinner) view.findViewById(R.id.sp_display);
-//				SQLiteDatabase sqldb = ScheduleController.openDataBase();,
-//				Cursor cr = sqldb.rawQuery("select Name from employee",null);
-//				if (cr.moveToFirst()) {
-//					do {
-//						playlist.add(cr.getString(0).toString());
-//						Toast.makeText(this,cr.getString(0).toString(),Toast.LENGTH_LONG).show();
-//						ArrayAdapter <String> a= new ArrayAdapter(this, android.R.layout.simple_spinner_item,playlist);
-//						a.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//						displaysp.setAdapter(a);
-//					} while (cr.moveToNext());
-//
-//				}
-
-				Toast.makeText(getActivity(),parent.getItemAtPosition(position)+" is selected",Toast.LENGTH_LONG).show();
-
-			}
-
-			@Override
-			public void onNothingSelected(AdapterView<?> parent) {
-
-			}
-		} );
+				else  if (myItemInt == 2) {
+					Toast.makeText(getActivity(), "Selected 3", Toast.LENGTH_LONG).show();
+				}
+				else  if (myItemInt == 3) {
+					Toast.makeText(getActivity(), "Selected 4", Toast.LENGTH_LONG).show();
+				}
+				else  if (myItemInt == 4) {
+					Toast.makeText(getActivity(), "Selected 5", Toast.LENGTH_LONG).show();
+				}
+				else  if (myItemInt == 5) {
+					Toast.makeText(getActivity(), "Selected 6", Toast.LENGTH_LONG).show();
+				}
 
 
-		play=(ImageButton)rootView.findViewById(R.id.ib_play);
-		play.setOnClickListener(new View.OnClickListener(){
-
-			@Override
-			public void onClick(View v) {
-
-			}
-		});
-
-		save=(ImageButton)rootView.findViewById(R.id.ib_save);
-		save.setOnClickListener(new View.OnClickListener(){
-
-			@Override
-			public void onClick(View v) {
-
-			}
-		});
-
-		saveas=(ImageButton)rootView.findViewById(R.id.ib_saveas);
-		saveas.setOnClickListener(new View.OnClickListener(){
-
-			@Override
-			public void onClick(View v) {
-
-			}
-		});
-
-		delete=(ImageButton)rootView.findViewById(R.id.ib_delete);
-		delete.setOnClickListener(new View.OnClickListener(){
-
-			@Override
-			public void onClick(View v) {
 
 			}
 		});
@@ -155,7 +94,115 @@ public class ScheduleFragment extends Fragment {
 	}
 
 
-	public void onClick(View v) {
 
+	private void bindDrapListener(int id) {
+		View v = mDrapView.findViewById(R.id.listview);
+		v.setOnTouchListener(mOnTouchListener);
+		v.setOnDragListener(mOnDragListener);
+	}
+
+	private View.OnTouchListener mOnTouchListener = new View.OnTouchListener() {
+
+		@Override
+		public boolean onTouch(View v, MotionEvent event) {
+			mDrapView = v;
+
+			if (mGestureDetector.onTouchEvent(event))
+				return true;
+
+			switch (event.getAction() & MotionEvent.ACTION_MASK) {
+				case MotionEvent.ACTION_UP:
+
+					break;
+			}
+
+			return false;
+		}
+	};
+
+	private View.OnDragListener mOnDragListener = new View.OnDragListener() {
+
+		@Override
+		public boolean onDrag(View v, DragEvent event) {
+			switch (event.getAction()) {
+				case DragEvent.ACTION_DRAG_STARTED:
+					break;
+				case DragEvent.ACTION_DRAG_ENTERED:
+					v.setAlpha(0.5F);
+					break;
+				case DragEvent.ACTION_DRAG_EXITED:
+					v.setAlpha(1F);
+					break;
+				case DragEvent.ACTION_DROP:
+					View view = (View) event.getLocalState();
+					for (int i = 0, j = tList.getChildCount(); i < j; i++) {
+						if (tList.getChildAt(i) == v) {
+							tList.removeView(view);
+							tList.addView(view, i);
+							break;
+						}
+					}
+					break;
+				case DragEvent.ACTION_DRAG_ENDED:
+					v.setAlpha(1F);
+				default:
+					break;
+			}
+			return true;
+		}
+	};
+
+	private class DrapGestureListener extends GestureDetector.SimpleOnGestureListener {
+		@Override
+		public boolean onSingleTapConfirmed(MotionEvent e) {
+			return super.onSingleTapConfirmed(e);
+		}
+
+		@Override
+		public void onLongPress(MotionEvent e) {
+			super.onLongPress(e);
+			ClipData data = ClipData.newPlainText("", "");
+			MyDragShadowBuilder shadowBuilder = new MyDragShadowBuilder(
+					mDrapView);
+			mDrapView.startDrag(data, shadowBuilder, mDrapView, 0);
+		}
+
+		@Override
+		public boolean onDown(MotionEvent e) {
+			return true;
+		}
+	}
+
+	private class MyDragShadowBuilder extends View.DragShadowBuilder {
+
+		private final WeakReference<View> mView;
+
+		public MyDragShadowBuilder(View view) {
+			super(view);
+			mView = new WeakReference<View>(view);
+		}
+
+		@Override
+		public void onDrawShadow(Canvas canvas) {
+			canvas.scale(1.5F, 1.5F);
+			super.onDrawShadow(canvas);
+		}
+
+		@Override
+		public void onProvideShadowMetrics(Point shadowSize,
+										   Point shadowTouchPoint) {
+			// super.onProvideShadowMetrics(shadowSize, shadowTouchPoint);
+
+			final View view = mView.get();
+			if (view != null) {
+				shadowSize.set((int) (view.getWidth() * 1.5F),
+						(int) (view.getHeight() * 1.5F));
+				shadowTouchPoint.set(shadowSize.x / 2, shadowSize.y / 2);
+			} else {
+				// Log.e(View.VIEW_LOG_TAG,
+				// "Asked for drag thumb metrics but no view");
+			}
+		}
 	}
 }
+
