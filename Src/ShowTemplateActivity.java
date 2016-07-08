@@ -342,8 +342,10 @@ public class ShowTemplateActivity extends Activity {
     @OnClick(R.id.show_template_img_adjust)
     void editSize(){
         if(templateViewNew.getAreaSelectedIndex()>-1){
-
-            String info="Canvas width : "+templateViewNew.getViewWidth()+lineSeparator+"Canvas height : "+templateViewNew.getViewHeight();
+            TemplateComponent selected=templateViewNew.getComponentById(templateViewNew.getAreaSelectedIndex());
+            int canvasWidth=templateViewNew.getViewWidth();
+            int canvasHeight=templateViewNew.getViewHeight();
+            String info="Canvas width : "+canvasWidth+lineSeparator+"Canvas height : "+canvasHeight;
             AlertDialog.Builder setSizeDialog=new AlertDialog.Builder(this);
             setSizeDialog.setTitle("Set Component Size");
             LayoutInflater inflater=(LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
@@ -353,7 +355,12 @@ public class ShowTemplateActivity extends Activity {
             final EditText etY=(EditText)dialogView.findViewById(R.id.edit_component_size_dialog_et_y);
             final EditText etWidth=(EditText)dialogView.findViewById(R.id.edit_component_size_dialog_et_width);
             final EditText etHeight=(EditText)dialogView.findViewById(R.id.edit_component_size_dialog_et_height);
+
             tvInfo.setText(info);
+            etX.setText(String.valueOf(selected.getLeft()*canvasWidth));
+            etY.setText(String.valueOf(selected.getTop()*canvasHeight));
+            etWidth.setText(String.valueOf((selected.getRight()-selected.getLeft())*canvasWidth));
+            etHeight.setText(String.valueOf((selected.getBottom()-selected.getTop())*canvasHeight));
             setSizeDialog.setView(dialogView);
             setSizeDialog.setPositiveButton("Save", new DialogInterface.OnClickListener() {
                 @Override
