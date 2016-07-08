@@ -234,8 +234,8 @@ public class ConfigurationFragment extends Fragment {
 
             }
         });//instruction*/
-        //add();
 
+        add();
         retd();//method for retreving value from database and set the result at the textview or radiobutton
         return rootView;
 
@@ -250,14 +250,13 @@ public class ConfigurationFragment extends Fragment {
 
     }//end og retd method
 
+    private void add()
+    {
+       controller.insert_setting3();
+    }
 
-//    private void add() {
-//
-//
-//        controller.insert_setting2();
-//
-//
-//    }//end of method
+
+
 
 
     public boolean isValidPassword(final String password) {
