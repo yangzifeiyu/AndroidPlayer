@@ -12,7 +12,7 @@ public class DbIniter {
 
     private SQLiteDatabase db;
     public static final String APP_FOLDER="/MFusion/";
-    public static final String DB_NAME="data.db";
+    public static final String DB_NAME="MfusionDataBase.db";
     public static final String TABLE_NAME_TEMPLATE="tamplate";
     public static final String TABLE_NAME_COMPONENT="component";
     public static final String TABLE_NAME_USER_SCREEN="userscreen";
@@ -23,7 +23,7 @@ public class DbIniter {
 
     public DbIniter() {
 
-        sdPath= Environment.getExternalStorageDirectory().getAbsolutePath().toString();
+        sdPath= Environment.getExternalStorageDirectory().getAbsolutePath().toString();//storage path
         init();
     }
 
@@ -58,7 +58,7 @@ public class DbIniter {
                     "insert into "+TABLE_NAME_TEMPLATE+" values(null,'Third Template')",
                     "insert into "+TABLE_NAME_TEMPLATE+" values(null,'Forth Template')",
                     "insert into "+TABLE_NAME_TEMPLATE+" values(null,'Fifth Template')",
-                    "insert into "+TABLE_NAME_TEMPLATE+" values(null,'Sixth Template')",};
+                    "insert into "+TABLE_NAME_TEMPLATE+" values(null,'Sixth Template')",};//insert template
 
             String[] components={"insert into "+TABLE_NAME_COMPONENT+" (id,left,top,right,bottom,tid) values(null,0,0,0.5,1,1)",
                     "insert into "+TABLE_NAME_COMPONENT+" (id,left,top,right,bottom,tid) values(null,0.5,0.5,1,1,1)",
@@ -83,7 +83,7 @@ public class DbIniter {
 
                     "insert into "+TABLE_NAME_COMPONENT+" (id,left,top,right,bottom,tid) values(null,0,0,0.25,1,6)",
                     "insert into "+TABLE_NAME_COMPONENT+" (id,left,top,right,bottom,tid) values(null,0.25,0,1,0.75,6)",
-                    "insert into "+TABLE_NAME_COMPONENT+" (id,left,top,right,bottom,tid) values(null,0.25,0.75,1,1,6)",};
+                    "insert into "+TABLE_NAME_COMPONENT+" (id,left,top,right,bottom,tid) values(null,0.25,0.75,1,1,6)",};//insert te,plate component
 
 
 
@@ -93,7 +93,7 @@ public class DbIniter {
             for(String current:components)
                 db.execSQL(current);
             db.setTransactionSuccessful();
-            db.endTransaction();
+            db.endTransaction();// end of transaction
 
 
 
