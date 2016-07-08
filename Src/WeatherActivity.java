@@ -5,9 +5,7 @@ import android.os.Bundle;
 
 import com.google.gson.Gson;
 
-/**
- * Created by JCYYYY on 2016/6/30.
- */
+
 public class WeatherActivity extends Activity{
 
     @Override
