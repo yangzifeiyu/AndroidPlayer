@@ -43,14 +43,13 @@ public class MainActivity extends FragmentActivity implements
 
 		controller = new DBController(MainActivity.this, "", null, 1);
 
-	//	DbIniter db=new DbIniter();
-
-
-
+		//DbIniter db=new DbIniter();
 		// Initilization
 		viewPager = (ViewPager) findViewById(R.id.pager);
 		actionBar = getActionBar();
 		mAdapter = new TabsPagerAdapter(getSupportFragmentManager());
+
+		actionBar.setDisplayShowHomeEnabled(false);
 
 		viewPager.setAdapter(mAdapter);
 		actionBar.setHomeButtonEnabled(false);
@@ -85,10 +84,16 @@ public class MainActivity extends FragmentActivity implements
 
 
 
-
+//		onstart();
 
 
 	}//oncreate
+
+//	private void onstart() {
+//
+//		controller.insert_setting3();
+//
+//	}
 
 	@Override
 	public void onTabReselected(Tab tab, FragmentTransaction ft) {
@@ -111,12 +116,13 @@ public class MainActivity extends FragmentActivity implements
 		if (keyCode == KeyEvent.KEYCODE_BACK) {
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setTitle("Password");
-			builder.setMessage("Enter User Exit Password if you set else just press OK:");
+			builder.setMessage("Enter Default or User set Password:");
 
 // Set up the input
 			final EditText input = new EditText(this);
 // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
-			input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+			//input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+			input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
 			builder.setView(input);
 
 // Set up the buttons
@@ -131,6 +137,7 @@ public class MainActivity extends FragmentActivity implements
 
 					if(value.equals(storedPassword))
 					{
+
 						Toast.makeText(MainActivity.this, "User Exit Successfully", Toast.LENGTH_LONG).show();
 
 						Intent intent = new Intent(getApplicationContext(), Home.class);
@@ -143,7 +150,6 @@ public class MainActivity extends FragmentActivity implements
 					else if(value != storedPassword)
 					{
 						Toast.makeText(MainActivity.this, "Password Wrong", Toast.LENGTH_LONG).show();
-						return;
 					}
 
 
