@@ -15,23 +15,26 @@ import com.example.mfusion.R;
 
 import java.io.File;
 
-//import com.example.mfusion.TemplateComponent.TemcompoClass;
-
-/**
- * Created by WANG on 6/8/2016.
- */
 public class DBController extends SQLiteOpenHelper {
-    private static final String DataBase_Name = "/mnt/sdcard/MFusion/MfusionDataBase.db";
-    private static final int DATABASE_VERSION = 1;
-    public static final String DB_NAME = "MfusionDataBase.db";
-    private String sdPath;
+    
+     private String sdPath;
     private SQLiteDatabase db;
+
+    private final String TAG = "DBController";
+
+
+    private static final int DATABASE_VERSION = 1;
     public static final String APP_FOLDER = "/MFusion/";
+    public static final String DB_NAME = "MfusionDataBase.db";
+
+
     public static final String TABLE_NAME_TEMPLATE = "tamplate";
     public static final String TABLE_NAME_COMPONENT = "component";
     public static final String TABLE_NAME_USER_SCREEN = "userscreen";
     public static final String TABLE_NAME_USER_SCREEN_COMPONENT = "userscreencomponent";
-    private final String TAG = "DBController";
+
+    public static final String DATABASE_FILE_PATH = Environment.getExternalStorageDirectory().toString();
+    //    private static final String DataBase_Name = "/mnt/sdcard/MfusionDataBase.db";
 
     public DBController(Context context, String s, Object o, int i) {
         super(context, DataBase_Name, null, DATABASE_VERSION);//specify the name,version,object
