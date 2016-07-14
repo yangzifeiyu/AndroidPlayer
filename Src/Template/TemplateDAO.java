@@ -1,19 +1,16 @@
 package com.example.mfusion.Template;
 
-import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.os.Environment;
-import android.util.Log;
-
-import com.example.mfusion.Database.DBController;
-//import com.example.mfusion.Database.DbIniter;
-import com.example.mfusion.model.MyTemplate;
-import com.example.mfusion.model.TemplateComponent;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import android.util.Log;
+import android.os.Environment;
+import android.content.Context;
+import android.database.Cursor;
+import com.example.mfusion.model.MyTemplate;
+import android.database.sqlite.SQLiteDatabase;
+import com.example.mfusion.Database.DBController;
+import com.example.mfusion.model.TemplateComponent;
 
 public class TemplateDAO {
     private static final String TAG = "TemplateDAO";
@@ -44,7 +41,7 @@ public class TemplateDAO {
             currentComponent.setId(result.getInt(5));
             componentList.add(currentComponent);
         }
-        String selectTemplateNameSql="select name from "+DBController.TABLE_NAME_TEMPLATE+" where id="+id;
+        String selectTemplateNameSql="select name from "+DBController.TABLE_NAME_TEMPLATE+" where id="+id;//select query
         Cursor nameResult=db.rawQuery(selectTemplateNameSql,null);
         nameResult.moveToLast();
         String templateName=nameResult.getString(0);
@@ -55,7 +52,8 @@ public class TemplateDAO {
         myTemplate.setName(templateName);
         return myTemplate;
 
-    }
+    }//getTemplateById(int id)
+    
     public List<MyTemplate> getAllTemplate(){
         int largestId=getLargestTemplateId();
         List<MyTemplate> list=new ArrayList<>();
@@ -71,13 +69,13 @@ public class TemplateDAO {
             String uriStr = "";
             if (component.getSourceUri() != null)
                 uriStr = component.getSourceUri().toString();
-            String updateComponent = "update " + DBController.TABLE_NAME_COMPONENT + " set left= " + component.getLeft() + ",top= " + component.getTop() + ",right=" + component.getRight() + ",bottom= " + component.getBottom() + ",type=" + component.getType() + ",sourceUri= '" + uriStr + "',sourceText= '" + component.getSourceText() + "' where id=" + component.getTid();
+            String updateComponent = "update " + DBController.TABLE_NAME_COMPONENT + " set left= " + component.getLeft() + ",top= " + component.getTop() + ",right=" + component.getRight() + ",bottom= " + component.getBottom() + ",type=" + component.getType() + ",sourceUri= '" + uriStr + "',sourceText= '" + component.getSourceText() + "' where id=" + component.getTid();//update query
             Log.i(TAG, "updateMyTemplete: update component sql=" + updateComponent);
             db.beginTransaction();
             db.execSQL(updateComponent);
             db.setTransactionSuccessful();
-            db.endTransaction();
-        }
+            db.endTransaction();//end of transaction
+        }//update Template
 
 
 
@@ -95,7 +93,7 @@ public class TemplateDAO {
         int lastestId=getLargestTemplateId();
         List<TemplateComponent> components=newTemplate.getList();
         for(TemplateComponent current:components){
-            String insertComponentSql="insert into "+DBController.TABLE_NAME_COMPONENT+" (id,left,top,right,bottom,tid) values(null,"+current.getLeft()+","+current.getTop()+","+current.getRight()+","+current.getBottom()+","+lastestId+")";
+            String insertComponentSql="insert into "+DBController.TABLE_NAME_COMPONENT+" (id,left,top,right,bottom,tid) values(null,"+current.getLeft()+","+current.getTop()+","+current.getRight()+","+current.getBottom()+","+lastestId+")";//insert query
             Log.i(TAG, "saveTemplate: insert component sql="+insertComponentSql);
             db.beginTransaction();
             db.execSQL(insertComponentSql);
@@ -104,7 +102,9 @@ public class TemplateDAO {
         }
 
 
-    }
+    }//save(insert) new template
+    
+    
     private int getLargestTemplateId(){
         String sql="select id from "+DBController.TABLE_NAME_TEMPLATE+" order by id desc limit 1";
         Cursor result=db.rawQuery(sql,null);
@@ -137,9 +137,9 @@ public class TemplateDAO {
             db.beginTransaction();
             db.execSQL(createUserScreenComponentSql);
             db.setTransactionSuccessful();
-            db.endTransaction();
+            db.endTransaction();//end of transaction
         }
-    }
+    }//create new screen
 
 
 
