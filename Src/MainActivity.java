@@ -86,7 +86,7 @@ public class MainActivity extends FragmentActivity implements
             public void run() {
                 test();
             }
-        }, 60*1000);
+        }, 60*1000);//display after 1 min
 
     }//oncreate
 
@@ -116,14 +116,14 @@ public class MainActivity extends FragmentActivity implements
             public void run() {
                 alertDialog.dismiss();
             }
-        }, 5*1000);
+        }, 5*1000);//dismiss after 5s
 
 
         new Handler().postDelayed(new Runnable(){
             public void run() {
                 test();
             }
-        }, 300*1000);
+        }, 300*1000);//display every 5 min
 
     }
     @Override
