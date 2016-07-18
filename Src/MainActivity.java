@@ -44,7 +44,7 @@ public class MainActivity extends FragmentActivity implements
 
         controller = new DBController(MainActivity.this, "", null, 1);
 
-        //DbIniter db=new DbIniter();
+       
         // Initilization
         viewPager = (ViewPager) findViewById(R.id.pager);
         actionBar = getActionBar();
@@ -96,18 +96,18 @@ public class MainActivity extends FragmentActivity implements
 
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
 
-// set title
-        alertDialogBuilder.setTitle("MediaFusion Ultimate Lite");
 
-// set dialog message
-        alertDialogBuilder.setMessage("Download our pro  edition now to try more!").setCancelable(false);
+        alertDialogBuilder.setTitle("MediaFusion Ultimate Lite");// set title
 
-// create alert dialog
-        final AlertDialog alertDialog = alertDialogBuilder.create();
 
-// show it
+        alertDialogBuilder.setMessage("Download our pro  edition now to try more!").setCancelable(false);// set dialog message
 
-        alertDialog.show();
+
+        final AlertDialog alertDialog = alertDialogBuilder.create();// create alert dialog
+
+
+
+        alertDialog.show();// show it
 
 // After some action
 
@@ -147,16 +147,16 @@ public class MainActivity extends FragmentActivity implements
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Password");
-            builder.setMessage("Enter Default or User set Password:");
+            builder.setMessage("Enter Default or User set Password:");// Set up the input
 
-// Set up the input
+
             final EditText input = new EditText(this);
 // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
             //input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
             input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
             builder.setView(input);
 
-// Set up the buttons
+
             builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
@@ -181,7 +181,7 @@ public class MainActivity extends FragmentActivity implements
 
 
                 }
-            });
+            });// Set up the buttons
             builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
