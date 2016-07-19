@@ -13,7 +13,8 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:id="@+id/template_list_img_new_template"
-        android:src="@drawable/new_template" />
+        android:src="@drawable/new_template"
+        android:layout_margin="5dp"/>
     <GridView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -24,7 +25,23 @@
 
          />
 
+    <ImageView
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:id="@+id/template_list_minus"
+        android:src="@drawable/minus"
+        android:layout_alignTop="@+id/template_list_img_new_template"
+        android:layout_toRightOf="@+id/template_list_img_new_template"
+         />
 
+    <ImageView
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:id="@+id/template_list_img_delete"
+        android:src="@drawable/template_delete"
+        android:layout_alignTop="@+id/template_list_minus"
+        android:layout_alignRight="@+id/template_list_gridview"
+        android:layout_alignEnd="@+id/template_list_gridview" />
 
 
 </RelativeLayout>
